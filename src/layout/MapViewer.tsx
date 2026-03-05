@@ -1,37 +1,81 @@
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import { MapContainer, Marker, TileLayer, ZoomControl } from "react-leaflet";
+import { useMapContext } from "@/contexts/MapContext";
+import {
+  MapContainer,
+  Marker,
+  Polygon,
+  Polyline,
+  TileLayer,
+  ZoomControl,
+  useMap,
+} from "react-leaflet";
+import { useEffect } from "react";
 
-type Props = {
-  markerIconUrl: string;
-  iconSize?: [number, number];
-  iconAnchor?: [number, number];
-};
-
-export const MapViewer = ({
-  markerIconUrl,
-  iconSize = [32, 32],
-  iconAnchor = [16, 32],
-}: Props) => {
-  const icon = L.icon({
-    iconUrl: markerIconUrl,
-    iconSize,
-    iconAnchor,
-  });
-
+const MapContent = ({
+  latitude,
+  longitude,
+  zoom,
+  children,
+}: {
+  latitude: number;
+  longitude: number;
+  zoom: number;
+  children?: React.ReactNode;
+}) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([latitude, longitude], zoom, { animate: true });
+  }, [map, latitude, longitude, zoom]);
   return (
-    <MapContainer
-      center={[35.6895, 139.6917]}
-      zoom={13}
-      zoomControl={false}
-      className="w-full h-full z-0"
-    >
+    <>
       <ZoomControl position="bottomright" />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={[35.6895, 139.6917]} icon={icon} />
+      {children}
+    </>
+  );
+};
+export const MapViewer = () => {
+  const { mapView, markers, lineTrack, isochronePolygons } = useMapContext();
+  const { latitude, longitude, zoom } = mapView;
+  const color = lineTrack.color?.length ? lineTrack.color : "3388ff";
+  const polyline = lineTrack.track ?? [];
+
+  const isochroneColor = isochronePolygons.color ?? "#fff";
+  console.log(isochronePolygons);
+
+  return (
+    <MapContainer
+      center={[latitude, longitude]}
+      zoom={zoom}
+      zoomControl={false}
+      className="w-full h-full z-0"
+    >
+      <MapContent latitude={latitude} longitude={longitude} zoom={zoom}>
+        {markers.map((marker, index) => (
+          <Marker key={index} position={[marker.latitude, marker.longitude]} />
+        ))}
+        <Polyline
+          pathOptions={{ color: "#ffffff", weight: 8 }}
+          positions={polyline}
+        />
+        <Polyline
+          pathOptions={{ color: `#${color}`, weight: 4 }}
+          positions={polyline}
+        />
+
+        {isochronePolygons && (
+          <Polygon
+            pathOptions={{ color: `${isochroneColor}`, weight: 6 }}
+            color={`#${isochroneColor}`}
+            positions={isochronePolygons.coordinates.filter(
+              (coord) => coord !== null,
+            )}
+          />
+        )}
+      </MapContent>
     </MapContainer>
   );
 };

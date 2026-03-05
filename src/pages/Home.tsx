@@ -4,6 +4,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { MapProvider } from "@/contexts/MapContext";
 import { MapViewer } from "@/layout/MapViewer";
 import { useEffect } from "react";
 
@@ -24,15 +25,17 @@ const HomeContent = () => {
         <HomeSidebar />
         {!openMobile && <SidebarTrigger />}
       </div>
-      <MapViewer markerIconUrl="/icons/station.png" />
+      <MapViewer />
     </div>
   );
 };
 
 export const Home = () => {
   return (
-    <SidebarProvider>
-      <HomeContent />
-    </SidebarProvider>
+    <MapProvider>
+      <SidebarProvider>
+        <HomeContent />
+      </SidebarProvider>
+    </MapProvider>
   );
 };

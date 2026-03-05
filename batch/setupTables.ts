@@ -4,8 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.VITE_SUPABASE_URL!;
+const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY!;
 
 const client = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -33,15 +33,6 @@ function readCsvDir<T extends Record<string, string>>(dir: string): T[] {
 }
 
 export const initStationTable = async () => {
-  const { data: data1, error: error1 } = await client
-    .from("prefecture_train_lines")
-    .delete()
-    .gte("id", 0);
-  if (error1) {
-    console.error("Error deleting prefecture_train_lines:", error1);
-  } else {
-    console.log("Prefecture_train_lines deleted successfully:", data1);
-  }
   const { data, error } = await client.from("stations").delete().gte("id", 0);
   if (error) {
     console.error("Error deleting stations:", error);
@@ -62,12 +53,20 @@ export const initTrainLineTable = async () => {
   }
 };
 
+export const initPrefectureLinesTable = async () => {
+  const { data, error } = await client
+    .from("prefecture_train_lines")
+    .delete()
+    .gte("id", 0);
+  if (error) {
+    console.error("Error deleting prefecture_train_lines:", error);
+  } else {
+    console.log("Prefecture_train_lines deleted successfully:", data);
+  }
+};
+
 export const importStationsCsv = async () => {
   const stations = readCsvDir(STATIONS_DIR);
-  const isEmptyRelation = await client
-    .from("prefecture_train_lines")
-    .select("*")
-    .limit(1);
   const isEmptyStation = await client.from("stations").select("*").limit(1);
   const stationsParams = stations.map((station, i) => ({
     id:
@@ -80,46 +79,18 @@ export const importStationsCsv = async () => {
     longitude: parseFloat(station.lon),
   }));
 
-  const prefectureAndLinesColumns = stations.map((station, i) => {
-    return {
-      id:
-        isEmptyRelation.data && isEmptyRelation.data.length > 0
-          ? undefined
-          : i + 1,
-      prefecture_code: station.pref_cd,
-      train_line_code: station.line_cd,
-    };
-  });
-  const uniqueRelations = Array.from(
-    new Map(
-      prefectureAndLinesColumns.map((r) => [
-        `${r.prefecture_code}-${r.train_line_code}`,
-        r,
-      ]),
-    ).values(),
-  );
-
   const { data, error } = await client.from("stations").insert(stationsParams);
   if (error) {
     console.error("Error inserting stations:", error);
   } else {
     console.log("Stations inserted successfully:", data);
   }
-  const { data: data2, error: error2 } = await client
-    .from("prefecture_train_lines")
-    .insert(uniqueRelations);
-  if (error2) {
-    console.error("Error inserting prefecture_train_lines:", error2);
-  } else {
-    console.log("Prefecture_train_lines inserted successfully:", data2);
-  }
 };
 
 export const importTrainLinesCsv = async () => {
   const lines = readCsvDir(LINES_DIR);
-  const isEmptyLine = await client.from("train_lines").select("*").limit(1);
   const lineParams = lines.map((line, i) => ({
-    id: isEmptyLine.data && isEmptyLine.data.length > 0 ? undefined : i + 1,
+    id: i + 1,
     code: line.line_cd,
     name: line.line_name,
     color: line.line_color_c,
@@ -132,5 +103,32 @@ export const importTrainLinesCsv = async () => {
     console.error("Error inserting lines:", error);
   } else {
     console.log("Lines inserted successfully:", data);
+  }
+};
+
+export const importPrefectureTrainLines = async () => {
+  const stations = readCsvDir(STATIONS_DIR);
+  const prefectureAndLinesColumns = stations.map((station, i) => {
+    return {
+      id: i + 1,
+      prefecture_code: station.pref_cd,
+      train_line_code: station.line_cd,
+    };
+  });
+  const uniqueRelations = Array.from(
+    new Map(
+      prefectureAndLinesColumns.map((r) => [
+        `${r.prefecture_code}-${r.train_line_code}`,
+        r,
+      ]),
+    ).values(),
+  );
+  const { data, error } = await client
+    .from("prefecture_train_lines")
+    .insert(uniqueRelations);
+  if (error) {
+    console.error("Error inserting prefecture_train_lines:", error);
+  } else {
+    console.log("Prefecture_train_lines inserted successfully:", data);
   }
 };

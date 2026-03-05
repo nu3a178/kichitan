@@ -3,13 +3,17 @@ import {
   importStationsCsv,
   initStationTable,
   initTrainLineTable,
-} from "./importRailwayCsv.js";
+  initPrefectureLinesTable,
+  importPrefectureTrainLines,
+} from "./setupTables.js";
 
 const run = async () => {
+  await initPrefectureLinesTable();
   await initStationTable();
   await initTrainLineTable();
   await importStationsCsv();
   await importTrainLinesCsv();
+  await importPrefectureTrainLines();
 };
 
 run()
