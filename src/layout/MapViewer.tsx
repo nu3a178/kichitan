@@ -10,22 +10,34 @@ import {
   useMap,
 } from "react-leaflet";
 import { useEffect } from "react";
+import { latLngBounds, type LatLngExpression } from "leaflet";
 
 const MapContent = ({
   latitude,
   longitude,
   zoom,
   children,
+  coordinates,
 }: {
   latitude: number;
   longitude: number;
   zoom: number;
   children?: React.ReactNode;
+  coordinates: LatLngExpression[];
 }) => {
   const map = useMap();
   useEffect(() => {
     map.setView([latitude, longitude], zoom, { animate: true });
   }, [map, latitude, longitude, zoom]);
+
+  useEffect(() => {
+    if (coordinates.length === 0) return;
+    map.fitBounds(latLngBounds(coordinates), {
+      animate: true,
+      padding: [40, 40],
+    });
+  }, [map, coordinates]);
+
   return (
     <>
       <ZoomControl position="bottomright" />
@@ -53,7 +65,12 @@ export const MapViewer = () => {
       zoomControl={false}
       className="w-full h-full z-0"
     >
-      <MapContent latitude={latitude} longitude={longitude} zoom={zoom}>
+      <MapContent
+        latitude={latitude}
+        longitude={longitude}
+        zoom={zoom}
+        coordinates={isochronePolygons?.coordinates ?? []}
+      >
         {markers.map((marker, index) => (
           <Marker key={index} position={[marker.latitude, marker.longitude]} />
         ))}
@@ -67,11 +84,13 @@ export const MapViewer = () => {
         />
 
         {isochronePolygons && (
-          <Polygon
-            pathOptions={{ color: `${isochroneColor}`, weight: 6 }}
-            color={`#${isochroneColor}`}
-            positions={isochronePolygons.coordinates}
-          />
+          <>
+            <Polygon
+              pathOptions={{ color: `${isochroneColor}`, weight: 6 }}
+              color={`#${isochroneColor}`}
+              positions={isochronePolygons.coordinates}
+            />
+          </>
         )}
         {stationLocation && (
           <Marker
