@@ -1,0 +1,7 @@
+services:
+  valhalla:
+    image: ghcr.io/valhalla/valhalla-scripted:3.6.3
+    volumes:
+      - ./custom_files:/custom_files
+    ports:
+    - "8002:8002"

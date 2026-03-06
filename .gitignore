@@ -28,3 +28,6 @@ dist-ssr
 /src/assets/csv/**
 !/src/assets/csv/**/
 !/src/assets/csv/**/.gitkeep
+
+/osrm-valhalla/custom_files/*
+!/osrm-valhalla/custom_files/.gitkeep
