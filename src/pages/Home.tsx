@@ -6,15 +6,11 @@ import {
 } from "@/components/ui/sidebar";
 import { MapProvider } from "@/contexts/MapContext";
 import { MapViewer } from "@/layout/MapViewer";
-import { useEffect } from "react";
+import { FaHouseUser } from "react-icons/fa";
 
 const HomeContent = () => {
-  const { isMobile, openMobile, setOpenMobile } = useSidebar();
-  useEffect(() => {
-    if (isMobile) {
-      setOpenMobile(false);
-    }
-  }, [isMobile, setOpenMobile]);
+  const { isMobile, openMobile } = useSidebar();
+
   return (
     <div
       className={
@@ -23,7 +19,12 @@ const HomeContent = () => {
     >
       <div className={isMobile ? "absolute left-0 z-[1000]" : ""}>
         <HomeSidebar />
-        {!openMobile && <SidebarTrigger />}
+        {!openMobile && (
+          <SidebarTrigger className="bg-green-800 text-white">
+            <FaHouseUser />
+            検索する
+          </SidebarTrigger>
+        )}
       </div>
       <div className={isMobile ? "absolute inset-0" : "flex-1 min-w-0"}>
         <MapViewer />
