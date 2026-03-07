@@ -11,8 +11,8 @@ const run = async () => {
   await initPrefectureLinesTable();
   await initStationTable();
   await initTrainLineTable();
-  await importStationsCsv();
   await importTrainLinesCsv();
+  await importStationsCsv();
   await importPrefectureTrainLines();
 };
 

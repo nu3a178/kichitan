@@ -9,8 +9,8 @@ const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY!;
 
 const client = createClient(supabaseUrl, supabaseAnonKey);
 
-const STATIONS_DIR = path.resolve("src/assets/csv/stations");
-const LINES_DIR = path.resolve("src/assets/csv/lines");
+const STATIONS_DIR = path.resolve("batch/csv/stations");
+const LINES_DIR = path.resolve("batch/csv/lines");
 
 function parseCsv<T extends Record<string, string>>(filePath: string): T[] {
   const content = fs.readFileSync(filePath, "utf-8");
@@ -67,10 +67,8 @@ export const initPrefectureLinesTable = async () => {
 
 export const importStationsCsv = async () => {
   const stations = readCsvDir(STATIONS_DIR);
-  const isEmptyStation = await client.from("stations").select("*").limit(1);
   const stationsParams = stations.map((station, i) => ({
-    id:
-      isEmptyStation.data && isEmptyStation.data.length > 0 ? undefined : i + 1,
+    id: i + 1,
     code: station.station_cd,
     prefecture_code: station.pref_cd,
     line_code: station.line_cd,
