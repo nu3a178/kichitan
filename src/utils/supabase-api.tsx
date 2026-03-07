@@ -62,3 +62,14 @@ export const searchReachableEstate = async (requestJson: any) => {
   });
   return result;
 };
+
+export const getStationsByQuery = async (query: string) => {
+  const { data, error } = await client
+    .from("stations")
+    .select("*,train_lines(name)")
+    .ilike("name", `%${query}%`);
+  if (error) {
+    throw error;
+  }
+  return data;
+};
