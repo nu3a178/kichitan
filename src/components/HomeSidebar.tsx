@@ -29,7 +29,7 @@ import type { Line } from "@/types/Line";
 import type { Station } from "@/types/Station";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import type { MarkerType } from "@/types/Markers";
+import type { Estate } from "@/types/Estate";
 import { CiSearch } from "react-icons/ci";
 import { Card, CardContent } from "./ui/card";
 import { toast } from "sonner";
@@ -57,7 +57,7 @@ export function HomeSidebar() {
   const { setOpenMobile } = useSidebar();
   const {
     setMapView,
-    setMarkers,
+    setEstateList,
     setLineTrack,
     setIsochronePolygons,
     setStationLocation,
@@ -217,7 +217,7 @@ export function HomeSidebar() {
       toast("該当する物件が見つかりませんでした", {});
       return;
     }
-    setMarkers(data.estates.map((estate: MarkerType) => ({ ...estate })));
+    setEstateList(data.estates.map((estate: Estate) => ({ ...estate })));
     toast(`${data.estates.length}件の物件が見つかりました`);
   };
   return (

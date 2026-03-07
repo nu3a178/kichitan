@@ -61,7 +61,7 @@ const MapContent = ({
 };
 export const MapViewer = () => {
   const { isMobile } = useSidebar();
-  const { mapView, markers, lineTrack, isochronePolygons, stationLocation } =
+  const { mapView, estateList, lineTrack, isochronePolygons, stationLocation } =
     useMapContext();
   const { latitude, longitude, zoom } = mapView;
   const [open, setOpen] = useState(false);
@@ -108,21 +108,34 @@ export const MapViewer = () => {
             zoom={zoom}
             coordinates={isochronePolygons?.coordinates ?? []}
           >
-            {markers.map((marker, index) => (
-              <Marker
-                key={index}
-                position={[marker.latitude, marker.longitude]}
-                eventHandlers={{
-                  click: () => {
-                    setEstate({
-                      address: marker.address ?? "",
-                      name: marker.name ?? "",
-                    });
-                    setOpen(true);
-                  },
-                }}
-              />
-            ))}
+            {estateList.map((estate, index) => {
+              const rentIcon = L.divIcon({
+                html: `<div style="display:inline-block;position:relative;">
+  <div style="background:white;border:2px solid #333;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.3);line-height:1.4;">¥${estate.rent_price?.toLocaleString()}</div>
+  <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #333;"></div>
+  <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid white;"></div>
+</div>`,
+                className: "",
+                iconSize: undefined,
+                iconAnchor: [40, 36],
+              });
+              return (
+                <Marker
+                  key={index}
+                  position={[estate.latitude, estate.longitude]}
+                  icon={rentIcon}
+                  eventHandlers={{
+                    click: () => {
+                      setEstate({
+                        address: estate.address ?? "",
+                        name: estate.name ?? "",
+                      });
+                      setOpen(true);
+                    },
+                  }}
+                />
+              );
+            })}
 
             <Polyline
               pathOptions={{ color: "#ffffff", weight: 8 }}

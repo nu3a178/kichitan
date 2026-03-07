@@ -1,20 +1,20 @@
 import type { LineTrackType } from "@/types/LineTrack";
 import type { MapView } from "@/types/MapView";
-import type { MarkersType, MarkerType } from "@/types/Markers";
+import type { EstateList, Estate } from "@/types/Estate";
 import { type LatLngExpression } from "leaflet";
 import { createContext, useContext, useState } from "react";
 
 type MapContextType = {
   mapView: MapView;
-  markers: MarkersType;
+  estateList: EstateList;
   lineTrack: LineTrackType;
   setMapView: (view: MapView) => void;
-  setMarkers: (markers: MarkersType) => void;
+  setEstateList: (estateList: EstateList) => void;
   setLineTrack: (lineTrack: LineTrackType) => void;
   isochronePolygons: IsochronePolygon;
   setIsochronePolygons: (isochronePolygons: IsochronePolygon) => void;
-  stationLocation: MarkerType | null;
-  setStationLocation: (stationLocation: MarkerType | null) => void;
+  stationLocation: Estate | null;
+  setStationLocation: (stationLocation: Estate | null) => void;
 };
 
 type IsochronePolygon = {
@@ -32,7 +32,7 @@ const DEFAULT_MAP_VIEW: MapView = {
 
 export const MapProvider = ({ children }: { children: React.ReactNode }) => {
   const [mapView, setMapView] = useState<MapView>(DEFAULT_MAP_VIEW);
-  const [markers, setMarkers] = useState<MarkersType>([]);
+  const [estateList, setEstateList] = useState<EstateList>([]);
   const [lineTrack, setLineTrack] = useState<LineTrackType>({
     color: undefined,
     track: [],
@@ -41,16 +41,14 @@ export const MapProvider = ({ children }: { children: React.ReactNode }) => {
     color: undefined,
     coordinates: [],
   });
-  const [stationLocation, setStationLocation] = useState<MarkerType | null>(
-    null,
-  );
+  const [stationLocation, setStationLocation] = useState<Estate | null>(null);
   return (
     <MapContext.Provider
       value={{
         mapView,
-        markers,
+        estateList,
         setMapView,
-        setMarkers,
+        setEstateList,
         lineTrack,
         setLineTrack,
         isochronePolygons,

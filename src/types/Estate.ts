@@ -1,7 +1,8 @@
-export type MarkerType = {
+export type Estate = {
   latitude: number;
   longitude: number;
   address?: string;
   name?: string;
+  rent_price?: number;
 };
-export type MarkersType = MarkerType[];
+export type EstateList = Estate[];
