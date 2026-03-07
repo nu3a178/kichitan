@@ -218,6 +218,7 @@ export function HomeSidebar() {
       return;
     }
     setMarkers(data.estates.map((estate: MarkerType) => ({ ...estate })));
+    toast(`${data.estates.length}件の物件が見つかりました`);
   };
   return (
     <Sidebar>
