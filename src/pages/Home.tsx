@@ -12,20 +12,22 @@ const HomeContent = () => {
   const { isMobile, openMobile, setOpenMobile } = useSidebar();
   useEffect(() => {
     if (isMobile) {
-      setOpenMobile(true);
+      setOpenMobile(false);
     }
   }, [isMobile, setOpenMobile]);
   return (
     <div
       className={
-        isMobile ? "relative w-screen h-screen" : "flex w-screen h-screen"
+        isMobile ? "relative w-[100dvw] h-[100dvh]" : "flex w-screen h-[100dvh]"
       }
     >
       <div className={isMobile ? "absolute left-0 z-[1000]" : ""}>
         <HomeSidebar />
         {!openMobile && <SidebarTrigger />}
       </div>
-      <MapViewer />
+      <div className={isMobile ? "absolute inset-0" : "flex-1 min-w-0"}>
+        <MapViewer />
+      </div>
     </div>
   );
 };

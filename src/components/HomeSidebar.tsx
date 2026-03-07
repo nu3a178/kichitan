@@ -3,6 +3,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { GiOrange } from "react-icons/gi";
 import {
@@ -31,6 +32,7 @@ import { Button } from "./ui/button";
 import type { MarkerType } from "@/types/Markers";
 import { CiSearch } from "react-icons/ci";
 import { Card, CardContent } from "./ui/card";
+import { toast } from "sonner";
 
 export function HomeSidebar() {
   const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
@@ -48,8 +50,9 @@ export function HomeSidebar() {
 
   const [stationSuggestions, setStationSuggestions] = useState<Station[]>([]);
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const { setOpenMobile } = useSidebar();
   const {
     setMapView,
     setMarkers,
@@ -155,7 +158,7 @@ export function HomeSidebar() {
   }, [selectedStation, setStationLocation]);
 
   const getStationSuggestions = async (value: string) => {
-    if (!value) {
+    if (value.trim() === "") {
       setStationSuggestions([]);
       return;
     }
@@ -184,11 +187,12 @@ export function HomeSidebar() {
     setStations(stationsInLine);
     setSelectedLine(lines.find((l) => l.code === station.line_code) ?? null);
     setSelectedStation(station);
-
+    setInputValue("");
     inputRef.current?.blur();
   };
 
   const onClickSearch = async () => {
+    setOpenMobile(false);
     setIsLoading(true);
     const requestJson = {
       locations: [
@@ -213,7 +217,9 @@ export function HomeSidebar() {
         }),
       ),
     });
-    if (!data.estates) return;
+    if (!data.estates) {
+      toast("該当する物件が見つかりませんでした", {});
+    }
     setMarkers(data.estates.map((estate: MarkerType) => ({ ...estate })));
   };
   return (
@@ -229,9 +235,17 @@ export function HomeSidebar() {
             ref={inputRef}
             placeholder="駅名で検索"
             className="rounded-2xl"
-            onChange={(e) => getStationSuggestions(e.target.value)}
+            onChange={(e) => {
+              getStationSuggestions(e.target.value);
+              setInputValue(e.target.value);
+            }}
             onFocus={() => setIsInputFocused(true)}
-            onBlur={() => setIsInputFocused(false)}
+            onBlur={(e) => {
+              setInputValue(e.target.value.trim());
+              setIsInputFocused(false);
+            }}
+            value={inputValue}
+            tabIndex={-1}
           />
           <CiSearch className="absolute right-2 top-2 h-6 w-6" />
           {isInputFocused && stationSuggestions.length > 0 && (
@@ -339,7 +353,6 @@ export function HomeSidebar() {
           <Input
             className="w-16"
             type="number"
-            min="0"
             value={time}
             onChange={(e) => setTime(Number(e.target.value))}
           />

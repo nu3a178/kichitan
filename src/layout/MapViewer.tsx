@@ -28,6 +28,13 @@ const MapContent = ({
   coordinates: LatLngExpression[];
 }) => {
   const map = useMap();
+
+  useEffect(() => {
+    // DOMが確定した後にサイズを再計算させる（モバイルでタイルが欠ける問題の修正）
+    const timer = setTimeout(() => map.invalidateSize(), 100);
+    return () => clearTimeout(timer);
+  }, [map]);
+
   useEffect(() => {
     map.setView([latitude, longitude], zoom, { animate: true });
   }, [map, latitude, longitude, zoom]);
@@ -108,6 +115,7 @@ export const MapViewer = () => {
               }}
             />
           ))}
+
           <Polyline
             pathOptions={{ color: "#ffffff", weight: 8 }}
             positions={polyline}
