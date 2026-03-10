@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "batch": "tsx batch/index.ts",
     "start": "npx supabase start",
-    "stop": "npx supabase stop"
+    "stop": "npx supabase stop",
+    "test": "vitest"
   },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
@@ -35,10 +36,13 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@supabase/supabase-js": "^2.97.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/leaflet": "^1.9.21",
     "@types/mapbox__polyline": "^1.0.5",
     "@types/node": "^24.10.13",
-    "@types/react": "^19.2.7",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "babel-plugin-react-compiler": "^1.0.0",
@@ -47,6 +51,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "jsdom": "^28.1.0",
     "shadcn": "^3.8.5",
     "tsx": "^4.21.0",
     "tw-animate-css": "^1.4.0",
