@@ -1,0 +1,22 @@
+name: test
+on:   
+    schedule:
+      - cron: "0 6 * * *"
+    workflow_dispatch:
+
+jobs:
+  test:
+    name: test
+    runs-on : ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Node.js and cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test 
