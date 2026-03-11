@@ -39,21 +39,26 @@ const HomeContent = () => {
         {!openDrawer && estateList.length > 0 && (
           <Button
             onClick={() => setOpenDrawer(true)}
-            className="absolute bottom-4 left-1/2 "
+            className="absolute right-4 bottom-1/2 rounded-full"
           >
-            検索結果
+            ←
           </Button>
         )}
 
-        <Drawer open={openDrawer} onOpenChange={setOpenDrawer}>
+        <Drawer
+          direction="right"
+          open={openDrawer}
+          onOpenChange={setOpenDrawer}
+        >
           <DrawerContent
             className="flex flex-col justify-end"
             data-testid="drawer"
           >
-            <div className="flex flex-row gap-2 overflow-x-auto p-4">
+            <div className="flex flex-col gap-2 overflow-y-auto p-4">
+              {`検索結果: ${estateList.length}件`}
               {estateList.map((estate, i) => (
                 <Card
-                  className="w-40 shrink-0 hover:shadow-lg hover:scale-105 transition-transform"
+                  className="w-full shrink-0 hover:shadow-lg hover:scale-105 transition-transform"
                   data-testid={`estate-${i}`}
                   onClick={() => {
                     setSelectedEstate(estate);
@@ -63,7 +68,7 @@ const HomeContent = () => {
                       zoom: 18,
                     });
                   }}
-                  key={estate.name}
+                  key={i}
                 >
                   <p>{estate.name}</p>
                   <p className="text-sm text-gray-500">{estate.address}</p>
