@@ -66,6 +66,8 @@ export const MapViewer = () => {
     lineTrack,
     isochronePolygons,
     stationLocation,
+    selectedEstate,
+    route,
     setSelectedEstate,
   } = useMapContext();
   const { setOpenDrawer } = useDrawerContext();
@@ -106,9 +108,9 @@ export const MapViewer = () => {
             {estateList.map((estate, index) => {
               const rentIcon = L.divIcon({
                 html: `<div style="display:inline-block;position:relative;">
-  <div style="background:white;border:2px solid #333;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.3);line-height:1.4;">¥${estate.rent_price?.toLocaleString()}</div>
+  <div style="background:${selectedEstate === estate ? "#3388ff" : "white"};border:2px solid #333;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.3);color:${selectedEstate === estate ? "white" : "black"};line-height:1.4;">¥${estate.rent_price?.toLocaleString()}</div>
   <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #333;"></div>
-  <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid white;"></div>
+  <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid ${selectedEstate === estate ? "#3388ff" : "white"};"></div>
 </div>`,
                 className: "",
                 iconSize: undefined,
@@ -137,7 +139,12 @@ export const MapViewer = () => {
               pathOptions={{ color: `#${color}`, weight: 4 }}
               positions={polyline}
             />
-
+            {route && (
+              <Polyline
+                pathOptions={{ color: "#ff3333", weight: 4 }}
+                positions={route}
+              />
+            )}
             {isochronePolygons && (
               <>
                 <Polygon

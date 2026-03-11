@@ -2,7 +2,10 @@ import type { LineTrackType } from "@/types/LineTrack";
 import type { MapView } from "@/types/MapView";
 import type { EstateList, Estate } from "@/types/Estate";
 import { type LatLngExpression } from "leaflet";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { getTwoPointsRoute } from "@/utils/supabase-api";
+
+type TransportationMode = "pedestrian" | "bicycle" | "auto";
 
 type MapContextType = {
   mapView: MapView;
@@ -17,6 +20,10 @@ type MapContextType = {
   setStationLocation: (stationLocation: Estate | null) => void;
   selectedEstate: Estate | null;
   setSelectedEstate: (estate: Estate | null) => void;
+  route: LatLngExpression[] | null;
+  setRoute: (route: LatLngExpression[] | null) => void;
+  transportationMode: TransportationMode;
+  setTransportationMode: (mode: TransportationMode) => void;
 };
 
 type IsochronePolygon = {
@@ -45,6 +52,25 @@ export const MapProvider = ({ children }: { children: React.ReactNode }) => {
     coordinates: [],
   });
   const [stationLocation, setStationLocation] = useState<Estate | null>(null);
+  const [route, setRoute] = useState<LatLngExpression[] | null>(null);
+  const [transportationMode, setTransportationMode] =
+    useState<TransportationMode>("pedestrian");
+  useEffect(() => {
+    if (!selectedEstate) return;
+    getTwoPointsRoute({
+      locations: [
+        { lat: selectedEstate.latitude, lon: selectedEstate.longitude },
+        {
+          lat: stationLocation?.latitude ?? 0,
+          lon: stationLocation?.longitude ?? 0,
+        },
+      ],
+      costing: transportationMode,
+      costing_options: { bicycle: { cycling_speed: 18 } },
+    }).then((data) => {
+      setRoute(data.polyline);
+    });
+  }, [selectedEstate, stationLocation, transportationMode]);
   return (
     <MapContext.Provider
       value={{
@@ -60,6 +86,10 @@ export const MapProvider = ({ children }: { children: React.ReactNode }) => {
         setStationLocation,
         selectedEstate,
         setSelectedEstate,
+        route,
+        setRoute,
+        transportationMode,
+        setTransportationMode,
       }}
     >
       {children}

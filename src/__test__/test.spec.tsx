@@ -13,6 +13,7 @@ import {
   getLinesInPrefecture,
   getPrefectures,
   getStationsInLine,
+  getTwoPointsRoute,
   searchReachableEstate,
 } from "@/utils/supabase-api";
 
@@ -48,6 +49,9 @@ vi.mock("@/utils/supabase-api", async () => {
     getLinesInPrefecture: vi.fn().mockResolvedValue(LINES),
     getStationsInLine: vi.fn().mockResolvedValue(STATIONS),
     searchReachableEstate: vi.fn().mockResolvedValue(ESTATES_AND_POLYGONS),
+    getTwoPointsRoute: vi
+      .fn()
+      .mockResolvedValue({ polyline: [[35, 135]], time: 0 }),
   };
 });
 beforeEach(() => {
@@ -158,10 +162,7 @@ test("路線を選択すると、地図が移動すること", async () => {
 
 test("路線を選択すると、路線のポリラインが表示されること", async () => {
   await selectJRYamanote();
-  const array = screen.queryAllByTestId("polyline");
-  array.map((polyline) => {
-    expect(polyline).toBeInTheDocument();
-  });
+  expect(screen.queryAllByTestId("polyline")).toHaveLength(2);
 });
 
 test("駅を選択すると、駅のピンが刺されること", async () => {
@@ -207,4 +208,32 @@ test("ドロワーの中に、検索結果のカードが表示されること",
   await executeSearch();
   const estates = screen.queryAllByTestId(/estate-/);
   expect(estates.length).toBe(26);
+});
+
+test("検索結果のカードをクリックしたとき、地図が移動すること", async () => {
+  await executeSearch();
+  const estates = screen.queryAllByTestId(/estate-/);
+  await act(async () => {
+    fireEvent.click(estates[0]);
+  });
+  expect(mockSetView).toHaveBeenCalledWith([35.658871, 139.701238], 14, {
+    animate: true,
+  });
+});
+
+test("検索結果のカードをクリックしたときに、その物件までのルートが表示されていること", async () => {
+  await executeSearch();
+  const estates = screen.queryAllByTestId(/estate-/);
+  await act(async () => {
+    fireEvent.click(estates[0]);
+  });
+  expect(getTwoPointsRoute).toHaveBeenCalledWith({
+    locations: [
+      { lat: 35.660601, lon: 139.699759 },
+      { lat: 35.658871, lon: 139.701238 },
+    ],
+    costing: "bicycle",
+    costing_options: { bicycle: { cycling_speed: 18 } },
+  });
+  expect(screen.queryAllByTestId("polyline")).toHaveLength(3);
 });

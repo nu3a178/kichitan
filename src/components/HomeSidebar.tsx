@@ -44,9 +44,6 @@ export function HomeSidebar() {
   const [selectedLine, setSelectedLine] = useState<Line | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
-  const [transportationMode, setTransportationMode] = useState<
-    "pedestrian" | "bicycle" | "auto"
-  >("pedestrian");
   const [time, setTime] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -63,6 +60,8 @@ export function HomeSidebar() {
     setLineTrack,
     setIsochronePolygons,
     setStationLocation,
+    transportationMode,
+    setTransportationMode,
   } = useMapContext();
 
   useEffect(() => {
@@ -190,17 +189,15 @@ export function HomeSidebar() {
   };
 
   const onClickSearch = async () => {
+    if (!selectedStation) return;
     setOpenMobile(false);
     setIsLoading(true);
     const requestJson = {
       locations: [
-        { lat: selectedStation?.latitude, lon: selectedStation?.longitude },
+        { lat: selectedStation.latitude!, lon: selectedStation.longitude! },
       ],
       costing: transportationMode,
-      costing_options:
-        transportationMode === "bicycle"
-          ? { bicycle: { cycling_speed: 18 } }
-          : undefined,
+      costing_options: { bicycle: { cycling_speed: 18 } },
       contours: [{ time, color: "87cefa" }],
     };
     setIsLoading(false);
