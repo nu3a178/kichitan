@@ -9,8 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "batch": "tsx batch/index.ts",
-    "start": "npx supabase start",
-    "stop": "npx supabase stop",
+    "start": "npx supabase start && cd osrm-valhalla && docker compose up -d && cd ..",
+    "stop": "npx supabase stop && cd osrm-valhalla && docker compose down && cd ..",
     "test": "vitest"
   },
   "dependencies": {
