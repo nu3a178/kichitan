@@ -70,7 +70,7 @@ export const MapProvider = ({ children }: { children: React.ReactNode }) => {
     }).then((data) => {
       setRoute(data.polyline);
     });
-  }, [selectedEstate, stationLocation, transportationMode]);
+  }, [selectedEstate, stationLocation]);
   return (
     <MapContext.Provider
       value={{
