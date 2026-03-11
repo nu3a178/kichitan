@@ -1,75 +1,48 @@
-# React + TypeScript + Vite
+### 概要
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+駅と移動手段、所要時間を入力することで、その駅から到達可能な物件を地図上にリストアップできるアプリケーションです。
 
-Currently, two official plugins are available:
+Web上の公開はまだ想定していません。
+<img width="1728" height="889" alt="Image" src="https://github.com/user-attachments/assets/fcc38c1f-9410-4397-b0fc-e7f177783a2a" />
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### setup
 
-## React Compiler
+1. dockerデーモンを立ち上げた状態で、ルートディレクトリで以下を実行する。
+```
+npx supabase start
+```
+2. .envファイルを作成し、以下のように内容を記述する。
+> VITE_SUPABASE_URL=http://127.0.0.1:54321
+>
+> VITE_SUPABASE_ANON_KEY=<supabaseのAuthentication Keys-Publishable>
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+3. /batch/csvの以下ディレクトリにcsvファイルを配置する。
 
-Note: This will impact Vite dev & build performances.
+> lines - 路線
+>
+> prefectures - 都道府県
+>
+> stations - 駅
 
-## Expanding the ESLint configuration
+csvファイルは、駅データ.jp(https://ekidata.jp/api) から取得してください。
+    
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+4. 以下コマンドを実行し、supabaseのテーブルにcsvデータを投入する。
+```
+npm run batch
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+5. /osrm-valhalla/custom-filesディレクトリに、osmデータファイルを配置する。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+    osmデータは以下からダウンロード可能です。
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+    https://download.geofabrik.de/asia/japan/kanto.html
+
+6. /osrm-valhalla ディレクトリで以下を実行する。
 ```
+docker compose up
+```
+
+実行環境として、最低でも8GBのメモリがないと動作は厳しいと思います。
+
