@@ -67,7 +67,7 @@ afterEach(() => {
 });
 
 test("タイトルが正しく表示されること", () => {
-  const element = screen.getByText("Range.St");
+  const element = screen.getByText("キチタン");
   expect(element).toBeInTheDocument();
 });
 
