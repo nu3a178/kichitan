@@ -3,7 +3,7 @@ import type { MapView } from "@/types/MapView";
 import type { EstateList, Estate } from "@/types/Estate";
 import { type LatLngExpression } from "leaflet";
 import { createContext, useContext, useEffect, useState } from "react";
-import { getTwoPointsRoute } from "@/utils/supabase-api";
+import { getTwoPointsRoute } from "@/utils/supabaseApi";
 
 type TransportationMode = "pedestrian" | "bicycle" | "auto";
 

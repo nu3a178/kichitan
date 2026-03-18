@@ -20,7 +20,7 @@ import {
   getStationsByQuery,
   getStationsInLine,
   searchReachableEstate,
-} from "@/utils/supabase-api";
+} from "@/utils/supabaseApi";
 import { useEffect, useRef, useState } from "react";
 import { useMapContext } from "@/contexts/MapContext";
 import type { Prefecture } from "@/types/Prefecture";
