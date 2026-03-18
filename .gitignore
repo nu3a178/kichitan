@@ -25,9 +25,9 @@ dist-ssr
 
 .env
 
-/batch/csv/**
-!/batch/csv/**/
-!/batch/csv/**/.gitkeep
+/seeder/csv/**
+!/seeder/csv/**/
+!/seeder/csv/**/.gitkeep
 
 /osrm-valhalla/custom_files/*
 !/osrm-valhalla/custom_files/.gitkeep
