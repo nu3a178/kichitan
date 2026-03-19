@@ -1,0 +1,9 @@
+services:
+  batch:
+    build: .
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python scraping.py

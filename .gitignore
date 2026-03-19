@@ -31,3 +31,5 @@ dist-ssr
 
 /osrm-valhalla/custom_files/*
 !/osrm-valhalla/custom_files/.gitkeep
+
+batch/node_modules/
