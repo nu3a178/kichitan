@@ -1,6 +1,6 @@
 import { useDrawerContext } from "@/contexts/DrawerContext";
 import { Card } from "./ui/card";
-import { Drawer, DrawerContent } from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "./ui/drawer";
 import { useMapContext } from "@/contexts/MapContext";
 import { Button } from "./ui/button";
 
@@ -23,6 +23,10 @@ export function HomeDrawer() {
           className="flex flex-col justify-end"
           data-testid="drawer"
         >
+          <DrawerHeader className="sr-only">
+            <DrawerTitle>検索結果</DrawerTitle>
+            <DrawerDescription>物件の検索結果一覧</DrawerDescription>
+          </DrawerHeader>
           <div className="flex flex-col gap-2 overflow-y-auto p-4">
             {`検索結果: ${estateList.length}件`}
             {estateList.map((estate, i) => (
