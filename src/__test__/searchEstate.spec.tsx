@@ -41,7 +41,7 @@ vi.mock("react-leaflet", () => ({
   }),
 }));
 
-vi.mock("@/utils/supabase-api", async () => {
+vi.mock("@/utils/supabaseApi", async () => {
   const { PREFECTURES, LINES, STATIONS, ESTATES_AND_POLYGONS } =
     await import("./const");
   return {
