@@ -9,9 +9,9 @@ const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY!;
 
 const client = createClient(supabaseUrl, supabaseAnonKey);
 
-const STATIONS_DIR = path.resolve("batch/csv/stations");
-const LINES_DIR = path.resolve("batch/csv/lines");
-const PREFECTURES_DIR = path.resolve("batch/csv/prefectures");
+const STATIONS_DIR = path.resolve("seeder/csv/stations");
+const LINES_DIR = path.resolve("seeder/csv/lines");
+const PREFECTURES_DIR = path.resolve("seeder/csv/prefectures");
 
 function parseCsv<T extends Record<string, string>>(filePath: string): T[] {
   const content = fs.readFileSync(filePath, "utf-8");

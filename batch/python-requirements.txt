@@ -1,4 +1,4 @@
-requests
+curl-cffi
 beautifulsoup4
 types-beautifulsoup4
 supabase
