@@ -32,8 +32,8 @@ totalJapanEstateCount = int(countNode.getText().strip().replace(",", ""))
 
 def insertEstates(geocode):
     today = date.today()
-    is_existing_estates = supabase.table("estates").select().gte("created_at", today.strftime("%Y-%m-%d")).single()
-    if(is_existing_estates):
+    is_existing_estates = supabase.table("estates").select().gte("created_at", today.strftime("%Y-%m-%d")).execute()
+    if(len(is_existing_estates.data) > 0):
         print(f"本日はすでに取得済です:{geocode}")
         return
     print(f"処理開始:{geocode}")
