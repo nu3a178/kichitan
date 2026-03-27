@@ -10,7 +10,7 @@ from datetime import date
 load_dotenv()
 
 supabase_url = os.environ["VITE_SUPABASE_URL"]
-supabase_key = os.environ["VITE_SUPABASE_ANON_KEY"]
+supabase_key = os.environ["SUPABASE_SERVICE_ROLE"]
 
 supabase: Client = create_client(supabase_url, supabase_key)
 
