@@ -1,11 +1,141 @@
+x-batch-base: &batch-base
+  build: .
+  volumes:
+    - .:/app
+  working_dir: /app
+  env_file: .env
+  environment:
+    - PYTHONUNBUFFERED=1
+  command: python scraping.py
+
 services:
-  batch:
-    build: .
-    volumes:
-      - .:/app
-    working_dir: /app
-    env_file: .env
+  batch-tokyo-23-0:
+    <<: *batch-base
     environment:
       - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=0
+      - CLOUD_RUN_TASK_SUB_INDEX=0
+      - CLOUD_RUN_TOTAL_SUB_INDEX=6
 
-    command: python scraping.py
+  batch-tokyo-23-1:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=0
+      - CLOUD_RUN_TASK_SUB_INDEX=1
+      - CLOUD_RUN_TOTAL_SUB_INDEX=6
+
+  batch-tokyo-23-2:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=0
+      - CLOUD_RUN_TASK_SUB_INDEX=2
+      - CLOUD_RUN_TOTAL_SUB_INDEX=6
+
+  batch-tokyo-23-3:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=0
+      - CLOUD_RUN_TASK_SUB_INDEX=3
+      - CLOUD_RUN_TOTAL_SUB_INDEX=6
+    
+  batch-tokyo-23-4:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=0
+      - CLOUD_RUN_TASK_SUB_INDEX=4
+      - CLOUD_RUN_TOTAL_SUB_INDEX=6
+  
+  batch-tokyo-23-5:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=0
+      - CLOUD_RUN_TASK_SUB_INDEX=5
+      - CLOUD_RUN_TOTAL_SUB_INDEX=6
+
+  batch-tokyo-other-0:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=1
+      - CLOUD_RUN_TASK_SUB_INDEX=0
+      - CLOUD_RUN_TOTAL_SUB_INDEX=2
+
+  batch-tokyo-other-1:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=1
+      - CLOUD_RUN_TASK_SUB_INDEX=1
+      - CLOUD_RUN_TOTAL_SUB_INDEX=2
+
+  batch-kanagawa-0:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=2
+      - CLOUD_RUN_TASK_SUB_INDEX=0
+      - CLOUD_RUN_TOTAL_SUB_INDEX=2
+
+  batch-kanagawa-1:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=2
+      - CLOUD_RUN_TASK_SUB_INDEX=1
+      - CLOUD_RUN_TOTAL_SUB_INDEX=2
+
+  
+  batch-tochigi:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=3
+
+  batch-chiba-0:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=4
+      - CLOUD_RUN_TASK_SUB_INDEX=0
+      - CLOUD_RUN_TOTAL_SUB_INDEX=2
+
+  batch-chiba-1:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=4
+      - CLOUD_RUN_TASK_SUB_INDEX=1
+      - CLOUD_RUN_TOTAL_SUB_INDEX=2
+
+  batch-gunma:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=5
+
+  batch-ibaraki:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=6
+
+  batch-saitama-0:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=7
+      - CLOUD_RUN_TASK_SUB_INDEX=0
+      - CLOUD_RUN_TOTAL_SUB_INDEX=2
+
+  batch-saitama-1:
+    <<: *batch-base
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CLOUD_RUN_TASK_INDEX=7
+      - CLOUD_RUN_TASK_SUB_INDEX=1
+      - CLOUD_RUN_TOTAL_SUB_INDEX=2

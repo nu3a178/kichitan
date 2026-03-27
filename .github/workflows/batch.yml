@@ -1,0 +1,80 @@
+name: batch
+on:
+  schedule:
+    - cron: "0 21 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  batch:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - task_index: 0
+            sub_index: 0
+            total_sub_index: 6
+          - task_index: 0
+            sub_index: 1
+            total_sub_index: 6
+          - task_index: 0
+            sub_index: 2
+            total_sub_index: 6
+          - task_index: 0
+            sub_index: 3
+            total_sub_index: 6
+          - task_index: 0
+            sub_index: 4
+            total_sub_index: 6
+          - task_index: 0
+            sub_index: 5
+            total_sub_index: 6
+          - task_index: 1
+            sub_index: 0
+            total_sub_index: 2
+          - task_index: 1
+            sub_index: 1
+            total_sub_index: 2
+          - task_index: 2
+            sub_index: 0
+            total_sub_index: 2
+          - task_index: 2
+            sub_index: 1
+            total_sub_index: 2
+          - task_index: 3
+          - task_index: 4
+            sub_index: 0
+            total_sub_index: 2
+          - task_index: 4
+            sub_index: 1
+            total_sub_index: 2
+          - task_index: 5
+          - task_index: 6
+          - task_index: 7
+            sub_index: 0
+            total_sub_index: 2
+          - task_index: 7
+            sub_index: 1
+            total_sub_index: 2
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r batch/python-requirements.txt
+
+      - name: Run batch
+        working-directory: batch
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          YAHOO_ESTATE_DOMAIN: ${{ secrets.YAHOO_ESTATE_DOMAIN }}
+          CLOUD_RUN_TASK_INDEX: ${{ matrix.task_index }}
+          CLOUD_RUN_TASK_SUB_INDEX: ${{ matrix.sub_index }}
+          CLOUD_RUN_TOTAL_SUB_INDEX: ${{ matrix.total_sub_index }}
+        run: python scraping.py
