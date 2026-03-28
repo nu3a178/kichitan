@@ -16,8 +16,10 @@ type MapContextType = {
   setLineTrack: (lineTrack: LineTrackType) => void;
   isochronePolygons: IsochronePolygon;
   setIsochronePolygons: (isochronePolygons: IsochronePolygon) => void;
-  stationLocation: Estate | null;
-  setStationLocation: (stationLocation: Estate | null) => void;
+  stationLocation: Pick<Estate, "latitude" | "longitude"> | null;
+  setStationLocation: (
+    stationLocation: Pick<Estate, "latitude" | "longitude"> | null,
+  ) => void;
   selectedEstate: Estate | null;
   setSelectedEstate: (estate: Estate | null) => void;
   route: LatLngExpression[] | null;
@@ -51,7 +53,10 @@ export const MapProvider = ({ children }: { children: React.ReactNode }) => {
     color: undefined,
     coordinates: [],
   });
-  const [stationLocation, setStationLocation] = useState<Estate | null>(null);
+  const [stationLocation, setStationLocation] = useState<Pick<
+    Estate,
+    "latitude" | "longitude"
+  > | null>(null);
   const [route, setRoute] = useState<LatLngExpression[] | null>(null);
   const [transportationMode, setTransportationMode] =
     useState<TransportationMode>("pedestrian");

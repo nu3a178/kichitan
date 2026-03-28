@@ -19,6 +19,7 @@
     "@valhallajs/valhallajs": "^3.6.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "firebase": "^12.11.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.575.0",
     "next-themes": "^0.4.6",
