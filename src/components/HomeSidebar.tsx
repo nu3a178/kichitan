@@ -389,7 +389,7 @@ export function HomeSidebar() {
             className="w-16"
             type="number"
             min={0}
-            value={time}
+            value={time || ""}
             onChange={(e) => {
               const value =
                 Number(e.target.value) > 30 ? 30 : Number(e.target.value);
