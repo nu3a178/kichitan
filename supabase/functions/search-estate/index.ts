@@ -93,6 +93,17 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
   const json = await req.json();
+
+  console.log(json);
+  if (json.contours[0].time > 30) {
+    return new Response(
+      JSON.stringify({ error: "Time exceeds maximum limit of 30 minutes" }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
   const response = await fetch(
     `${valhallaUrl}/isochrone?json=${encodeURIComponent(JSON.stringify(json))}`,
     {

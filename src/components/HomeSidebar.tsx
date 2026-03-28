@@ -390,7 +390,11 @@ export function HomeSidebar() {
             type="number"
             min={0}
             value={time}
-            onChange={(e) => setTime(Number(e.target.value))}
+            onChange={(e) => {
+              const value =
+                Number(e.target.value) > 30 ? 30 : Number(e.target.value);
+              setTime(value);
+            }}
           />
           <p>分</p>
         </div>
