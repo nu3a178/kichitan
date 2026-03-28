@@ -34,6 +34,7 @@ import { Card, CardContent } from "./ui/card";
 import { toast } from "sonner";
 import { CgSpinner } from "react-icons/cg";
 import { useDrawerContext } from "@/contexts/DrawerContext";
+import { useRouteContext } from "@/contexts/RouteContext";
 
 export function HomeSidebar() {
   const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
@@ -61,9 +62,9 @@ export function HomeSidebar() {
     setStationLocation,
     transportationMode,
     setTransportationMode,
-    setRoute,
     setSelectedEstate,
   } = useMapContext();
+  const { setRoute } = useRouteContext();
 
   useEffect(() => {
     const fetchPrefectures = async () => {
@@ -218,25 +219,31 @@ export function HomeSidebar() {
       costing_options: { bicycle: { cycling_speed: 18 } },
       contours: [{ time, color: "87cefa" }],
     };
-    setIsLoading(false);
-    const data = await searchReachableEstate(requestJson);
-
-    setIsochronePolygons({
-      color: data.polygon.features[0].properties.fillColor ?? undefined,
-      coordinates: data.polygon.features[0].geometry.coordinates.map(
-        (coord: [number, number]) => ({
-          lat: coord[1],
-          lng: coord[0],
-        }),
-      ),
-    });
-    if (!data.estates) {
-      toast("該当する物件が見つかりませんでした", {});
-      return;
+    try {
+      const data = await searchReachableEstate(requestJson);
+      setIsochronePolygons({
+        color: data.polygon.features[0].properties.fillColor ?? undefined,
+        coordinates: data.polygon.features[0].geometry.coordinates.map(
+          (coord: [number, number]) => ({
+            lat: coord[1],
+            lng: coord[0],
+          }),
+        ),
+      });
+      if (!data.estates) {
+        toast.error("該当する物件が見つかりませんでした");
+        return;
+      }
+      setEstateList(data.estates.map((estate: Estate) => ({ ...estate })));
+      setOpenDrawer(true);
+      toast.success(`${data.estates.length}件の物件が見つかりました`);
+    } catch {
+      toast.error(
+        "物件検索でエラーが発生しました。しばらくしてから、再度お試しください。",
+      );
+    } finally {
+      setIsLoading(false);
     }
-    setEstateList(data.estates.map((estate: Estate) => ({ ...estate })));
-    setOpenDrawer(true);
-    toast(`${data.estates.length}件の物件が見つかりました`);
   };
   const inputDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   return (
@@ -381,6 +388,7 @@ export function HomeSidebar() {
             id="time-input"
             className="w-16"
             type="number"
+            min={0}
             value={time}
             onChange={(e) => setTime(Number(e.target.value))}
           />

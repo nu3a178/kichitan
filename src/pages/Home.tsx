@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { DrawerProvider } from "@/contexts/DrawerContext";
 import { MapProvider } from "@/contexts/MapContext";
+import { RouteProvider } from "@/contexts/RouteContext";
 import { MapViewer } from "@/layout/MapViewer";
 import { FaHouseUser } from "react-icons/fa";
 
@@ -43,11 +44,13 @@ const HomeContent = () => {
 export const Home = () => {
   return (
     <MapProvider>
-      <SidebarProvider>
-        <DrawerProvider>
-          <HomeContent />
-        </DrawerProvider>
-      </SidebarProvider>
+      <RouteProvider>
+        <SidebarProvider>
+          <DrawerProvider>
+            <HomeContent />
+          </DrawerProvider>
+        </SidebarProvider>
+      </RouteProvider>
     </MapProvider>
   );
 };

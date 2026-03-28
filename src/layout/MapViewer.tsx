@@ -14,6 +14,7 @@ import L, { latLngBounds, type LatLngExpression } from "leaflet";
 
 import trainPng from "@/assets/train.png";
 import { useDrawerContext } from "@/contexts/DrawerContext";
+import { useRouteContext } from "@/contexts/RouteContext";
 
 const MapContent = ({
   latitude,
@@ -67,9 +68,9 @@ export const MapViewer = () => {
     isochronePolygons,
     stationLocation,
     selectedEstate,
-    route,
     setSelectedEstate,
   } = useMapContext();
+  const { route } = useRouteContext();
   const { setOpenDrawer } = useDrawerContext();
   const { latitude, longitude, zoom } = mapView;
 
