@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import L, { latLngBounds, type LatLngExpression } from "leaflet";
 
 import trainPng from "@/assets/train.png";
+import squareSvg from "@/assets/square.svg";
 import { useDrawerContext } from "@/contexts/DrawerContext";
 import { useRouteContext } from "@/contexts/RouteContext";
 
@@ -86,6 +87,17 @@ export const MapViewer = () => {
     iconSize: [36, 36],
     iconAnchor: [18, 18],
   });
+  const gradientColorByRentPrice = (price: number): string => {
+    const minPrice = 50000;
+    const maxPrice = 150000;
+    const hue =
+      price <= minPrice
+        ? 90
+        : price >= maxPrice
+          ? 15
+          : 90 * (1 - (price - minPrice) / (maxPrice - minPrice)) + 15;
+    return `hsl(${hue}, 100%, 80%)`;
+  };
   return (
     <>
       <div className="relative w-full h-full">
@@ -107,11 +119,13 @@ export const MapViewer = () => {
             coordinates={isochronePolygons?.coordinates ?? []}
           >
             {estateList.map((estate, index) => {
+              const color = gradientColorByRentPrice(estate.rent_price);
+              const sizeIcon = `<div style="position:relative;"><p style="position:absolute;top:5px;left:7px;font-size:10px;">${estate.area > 99 ? "99" : Math.round(estate.area)}</p><img style="width:25px;height:25px;${selectedEstate === estate ? "filter:brightness(0) invert(1);" : ""}" src=${squareSvg} /></div>`;
               const rentIcon = L.divIcon({
-                html: `<div style="display:inline-block;position:relative;">
-  <div style="background:${selectedEstate === estate ? "#3388ff" : "white"};border:2px solid #333;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.3);color:${selectedEstate === estate ? "white" : "black"};line-height:1.4;">¥${estate.rent_price?.toLocaleString()}</div>
+                html: `<div style="position:relative;">
+  <div style="background:${selectedEstate === estate ? "#3388ff" : color};border:2px solid #333;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.3);color:${selectedEstate === estate ? "white" : "black"};line-height:1.4;display:flex;align-items:center;gap:4px;">¥${estate.rent_price.toLocaleString()}${sizeIcon}</div>
   <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #333;"></div>
-  <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid ${selectedEstate === estate ? "#3388ff" : "white"};"></div>
+  <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid ${selectedEstate === estate ? "#3388ff" : color};"></div>
 </div>`,
                 className: "",
                 iconSize: undefined,
