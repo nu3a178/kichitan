@@ -35,6 +35,10 @@ import { toast } from "sonner";
 import { CgSpinner } from "react-icons/cg";
 import { useDrawerContext } from "@/contexts/DrawerContext";
 import { useRouteContext } from "@/contexts/RouteContext";
+import { IoInformationCircleOutline } from "react-icons/io5";
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import releaseNoteTexts from "@/assets/release_note";
+import { Link } from "react-router-dom";
 
 export function HomeSidebar() {
   const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
@@ -406,7 +410,29 @@ export function HomeSidebar() {
           {isLoading ? <CgSpinner className="animate-spin" /> : "検索開始"}
         </Button>
       </SidebarContent>
-
+      <div className="text-end ">
+        <Dialog>
+          <DialogTrigger>
+            <IoInformationCircleOutline className="inline-block hover:bg-gray-400 rounded-full" />
+          </DialogTrigger>
+          <DialogContent className="text-xs text-gray-600">
+            {releaseNoteTexts.map((text, i) => (
+              <p key={i}>{text}</p>
+            ))}
+            <p className="text-gray-400">
+              {`※このサービスは、経路探索APIとして`}
+              <Link
+                to="https://valhalla.readthedocs.io/en/latest/"
+                target="_blank"
+                className="text-blue-500 underline"
+              >
+                Valhalla API
+              </Link>
+              {`を使用しています。`}
+            </p>
+          </DialogContent>
+        </Dialog>
+      </div>
       <SidebarFooter />
     </Sidebar>
   );
