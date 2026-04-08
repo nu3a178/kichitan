@@ -35,3 +35,5 @@ dist-ssr
 batch/node_modules/
 .agents/*
 .claude/**/
+
+*.cache
