@@ -15,7 +15,7 @@ import {
   getStationsInLine,
   getTwoPointsRoute,
   searchReachableEstate,
-} from "@/utils/supabaseApi";
+} from "@/utils/api";
 
 expect.extend(matchers);
 const mockSetView = vi.hoisted(() => vi.fn());
