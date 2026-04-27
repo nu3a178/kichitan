@@ -32,6 +32,12 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import releaseNoteTexts from "@/assets/release_note";
 import { Link } from "react-router-dom";
+import {
+  getLinesInPrefecture,
+  getStationsByQuery,
+  getStationsInLine,
+  searchReachableEstate,
+} from "@/utils/api";
 
 export function HomeSidebar() {
   const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
@@ -87,8 +93,7 @@ export function HomeSidebar() {
     setSelectedPrefecture(selectedPrefecture);
     setSelectedLine(null);
     setSelectedStation(null);
-    const data = await fetch(`${apiUrl}/train_lines?p_code=${code}`);
-    const lines = (await data.json()) as Line[];
+    const lines = await getLinesInPrefecture(selectedPrefecture.code);
     setLines(lines);
   };
 
@@ -99,8 +104,7 @@ export function HomeSidebar() {
     setSelectedLine(line);
     setSelectedStation(null);
 
-    const data = await fetch(`${apiUrl}/stations?l_code=${code}`);
-    const stations = (await data.json()) as Station[];
+    const stations = await getStationsInLine(code);
     setStations(stations);
   };
 
@@ -171,78 +175,82 @@ export function HomeSidebar() {
   }, [selectedStation, setStationLocation]);
 
   const getStationSuggestions = async (value: string) => {
-    // if (value.trim() === "") {
-    //   setStationSuggestions([]);
-    //   return;
-    // }
-    // const result = await getStationsByQuery(value);
-    // setStationSuggestions(result);
+    if (value.trim() === "") {
+      setStationSuggestions([]);
+      return;
+    }
+    console.log(value);
+    const result = await getStationsByQuery(value);
+    setStationSuggestions(result);
   };
 
   // 選択した駅候補について、属している県と路線情報も含めてセットする
   const onClickSuggestion = async (station: Station) => {
-    // // 選択した駅の属する県をセット
-    // const prefecture = prefectures.find(
-    //   (p) => p.code === station.prefecture_code,
-    // );
-    // const lineCode = station.line_code;
-    // if (!prefecture || !lineCode) return;
-    // setSelectedPrefecture(prefecture);
-    // // 並行fetchして await 境界を減らす（途中のstate更新でズームが路線に向かないようにする）
-    // const [lines, stationsInLine] = await Promise.all([
-    //   getLinesInPrefecture(station.prefecture_code!),
-    //   getStationsInLine(station.line_code!),
-    // ]);
-    // // 全stateを一度にセット → useEffectは selectedStation が存在する状態で発火する
-    // setLines(lines);
-    // setStations(stationsInLine);
-    // setSelectedLine(lines.find((l) => l.code === station.line_code) ?? null);
-    // setSelectedStation(station);
-    // setInputValue("");
-    // inputTimeRef.current?.focus();
+    // 選択した駅の属する県をセット
+    const prefecture = prefectures.find(
+      (p) => p.code === station.prefecture.code,
+    );
+    const lineCode = station.train_line?.code;
+    if (!prefecture || !lineCode) return;
+    setSelectedPrefecture(prefecture);
+    // 並行fetchして await 境界を減らす（途中のstate更新でズームが路線に向かないようにする）
+    const [lines, stationsInLine] = await Promise.all([
+      getLinesInPrefecture(station.prefecture.code!),
+      getStationsInLine(station.train_line.code!),
+    ]);
+    // 全stateを一度にセット → useEffectは selectedStation が存在する状態で発火する
+    setLines(lines);
+    setStations(stationsInLine);
+    setSelectedLine(
+      lines.find((l) => l.code === station.train_line.code) ?? null,
+    );
+    setSelectedStation(station);
+    setInputValue("");
+    inputTimeRef.current?.focus();
   };
 
   const onClickSearch = async () => {
-    // setRoute(null);
-    // setEstateList([]);
-    // setSelectedEstate(null);
-    // setIsochronePolygons({ color: undefined, coordinates: [] });
-    // if (!selectedStation) return;
-    // setOpenMobile(false);
-    // setIsLoading(true);
-    // const requestJson = {
-    //   locations: [
-    //     { lat: selectedStation.latitude!, lon: selectedStation.longitude! },
-    //   ],
-    //   costing: transportationMode,
-    //   costing_options: { bicycle: { cycling_speed: 18 } },
-    //   contours: [{ time, color: "87cefa" }],
-    // };
-    // try {
-    //   const data = await searchReachableEstate(requestJson);
-    //   setIsochronePolygons({
-    //     color: data.polygon.features[0].properties.fillColor ?? undefined,
-    //     coordinates: data.polygon.features[0].geometry.coordinates.map(
-    //       (coord: [number, number]) => ({
-    //         lat: coord[1],
-    //         lng: coord[0],
-    //       }),
-    //     ),
-    //   });
-    //   if (!data.estates) {
-    //     toast.error("該当する物件が見つかりませんでした");
-    //     return;
-    //   }
-    //   setEstateList(data.estates.map((estate: Estate) => ({ ...estate })));
-    //   setOpenDrawer(true);
-    //   toast.success(`${data.estates.length}件の物件が見つかりました`);
-    // } catch {
-    //   toast.error(
-    //     "物件検索でエラーが発生しました。しばらくしてから、再度お試しください。",
-    //   );
-    // } finally {
-    //   setIsLoading(false);
-    // }
+    setRoute(null);
+    setEstateList([]);
+    setSelectedEstate(null);
+    setIsochronePolygons({ color: undefined, coordinates: [] });
+    if (!selectedStation) return;
+    setOpenMobile(false);
+    setIsLoading(true);
+    const requestJson = {
+      locations: [
+        { lat: selectedStation.latitude!, lon: selectedStation.longitude! },
+      ],
+      costing: transportationMode,
+      costing_options: { bicycle: { cycling_speed: 18 } },
+      contours: [{ time, color: "87cefa" }],
+    };
+    try {
+      const data = await searchReachableEstate(requestJson);
+      setIsochronePolygons({
+        color: data.polygon.features[0].properties.fillColor ?? undefined,
+        coordinates: data.polygon.features[0].geometry.coordinates.map(
+          (coord: [number, number]) => ({
+            lat: coord[1],
+            lng: coord[0],
+          }),
+        ),
+      });
+      if (!data.estates) {
+        toast.error("該当する物件が見つかりませんでした");
+        return;
+      }
+      setEstateList(data.estates.map((estate: Estate) => ({ ...estate })));
+      setOpenDrawer(true);
+      toast.success(`${data.estates.length}件の物件が見つかりました`);
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        "物件検索でエラーが発生しました。しばらくしてから、再度お試しください。",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
   const inputDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   return (
@@ -288,7 +296,7 @@ export function HomeSidebar() {
                     onClick={() => onClickSuggestion(station)}
                   >
                     <p className="text-xs text-gray-500">
-                      {station.train_lines?.name ?? ""}
+                      {station.train_line?.name ?? ""}
                     </p>
                     <p className="text-sm">{station.name}</p>
                   </CardContent>

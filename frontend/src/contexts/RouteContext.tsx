@@ -6,7 +6,7 @@ import {
   startTransition,
   useEffect,
 } from "react";
-import { getTwoPointsRoute } from "@/utils/supabaseApi";
+import { getTwoPointsRoute } from "@/utils/api";
 import { useMapContext } from "@/contexts/MapContext";
 
 type RouteContextType = {

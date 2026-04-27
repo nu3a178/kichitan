@@ -14,6 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STATIONS_DIR = path.resolve(__dirname, "csv/stations");
 const LINES_DIR = path.resolve(__dirname, "csv/lines");
 const PREFECTURES_DIR = path.resolve(__dirname, "csv/prefectures");
+const ESTATES_DIR = path.resolve(__dirname, "csv/estates");
 
 function parseCsv<T extends Record<string, string>>(filePath: string): T[] {
   const content = fs.readFileSync(filePath, "utf-8");
@@ -143,6 +144,46 @@ export const importTrainLinesCsv = async () => {
     console.error("Error inserting lines:", result);
   } else {
     console.log("Lines inserted successfully:", result.count);
+  }
+};
+
+export const initEstateTable = async () => {
+  if (process.env.NODE_ENV !== "dev") return;
+  try {
+    const result = await prisma.estate.deleteMany();
+    console.log("Estates deleted successfully:", result.count);
+  } catch (error) {
+    console.error("Error deleting estates:", error);
+  }
+};
+
+export const importEstatesCsv = async () => {
+  if (process.env.NODE_ENV !== "dev") return;
+  const estates = readCsvDir(ESTATES_DIR);
+  const estateParams = estates.map((e) => ({
+    name: e.name,
+    address: e.address ?? "",
+    latitude: parseFloat(e.latitude),
+    longitude: parseFloat(e.longitude),
+    rent_price: e.rent_price ? parseInt(e.rent_price, 10) : 0,
+  }));
+  try {
+    const result = await prisma.estate.createMany({ data: estateParams });
+    console.log("Estates inserted successfully:", result.count);
+  } catch (error) {
+    console.error("Error inserting estates:", error);
+  }
+};
+
+export const setGeomIntoEstates = async () => {
+  if (process.env.NODE_ENV !== "dev") return;
+  try {
+    const result = await fetch(`http://localhost:3000/set_geom`, {
+      method: "POST",
+    });
+    console.log("Geom set into estates successfully");
+  } catch (error) {
+    console.error("Error setting geom into estates:", error);
   }
 };
 

@@ -7,6 +7,9 @@ import {
   importPrefectureTrainLines,
   importPrefecturesCsv,
   initPrefectureTable,
+  initEstateTable,
+  importEstatesCsv,
+  setGeomIntoEstates,
 } from "./setupTables.js";
 
 const run = async () => {
@@ -14,10 +17,13 @@ const run = async () => {
   await initStationTable();
   await initTrainLineTable();
   await initPrefectureTable();
+  await initEstateTable();
   await importPrefecturesCsv();
   await importTrainLinesCsv();
   await importStationsCsv();
   await importPrefectureTrainLines();
+  await importEstatesCsv();
+  await setGeomIntoEstates();
 };
 
 run()
