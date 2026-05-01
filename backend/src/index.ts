@@ -76,11 +76,12 @@ app.get("/suggest_station", async (c) => {
   });
   return c.json(suggestions);
 });
-
 app.post("/set_geom", async (c) => {
+  const geoCode = c.req.query("geo_code");
   const result = await prisma.$executeRaw`
-    UPDATE "Estate"
+    UPDATE "Estate" 
     SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
+    WHERE geo_code = ${geoCode}
   `;
   return c.json({ updated: result });
 });
@@ -129,6 +130,34 @@ app.get("/estate_route", async (c) => {
   const encodedRoute = responseData.trip.legs[0].shape;
   const time = responseData.trip.legs[0].summary.time;
   return c.json({ encodedRoute, time });
+});
+app.delete("/estates", async (c) => {
+  const geoCode = c.req.query("geo_code");
+  const result = await prisma.estate.deleteMany({
+    where: {
+      geo_code: geoCode,
+    },
+  });
+  return c.json({ deleted: result.count });
+});
+
+app.post("/estates", async (c) => {
+  const data = await c.req.json();
+  const result = await prisma.estate.createMany({
+    data,
+  });
+  return c.json({ created: result });
+});
+app.get("/estates", async (c) => {
+  const geoCode = c.req.query("geo_code");
+  const date = new Date(c.req.query("date") ?? "1900-01-01");
+  const estates = await prisma.estate.findMany({
+    where: {
+      geo_code: geoCode,
+      created_at: { gte: date },
+    },
+  });
+  return c.json(estates);
 });
 
 serve(

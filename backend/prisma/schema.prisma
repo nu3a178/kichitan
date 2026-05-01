@@ -24,6 +24,7 @@ model Estate {
   area       Float?
   years_old  Int?
   floor_num  String?
+  geo_code   String?
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @updatedAt @db.Timestamptz(6)
 }

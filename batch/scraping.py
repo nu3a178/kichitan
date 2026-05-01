@@ -1,7 +1,7 @@
 from curl_cffi.requests import Session
 from bs4 import BeautifulSoup
 import os
-from supabase import create_client,Client
+import requests
 from const import GEOCODE_LISTS
 from dotenv import load_dotenv
 import re
@@ -9,13 +9,8 @@ import json
 from datetime import date
 load_dotenv()
 
-supabase_url = os.environ["VITE_SUPABASE_URL"]
-supabase_key = os.environ["SUPABASE_SERVICE_ROLE"]
-
-supabase: Client = create_client(supabase_url, supabase_key)
-
-BASE_URL = "https://realestate.yahoo.co.jp/rent/search/"
-
+BASE_URL = f"{os.environ['YAHOO_ESTATE_DOMAIN']}/rent/search/"
+DOMAIN = os.environ["DB_DEV"] if os.environ["ENV"] == "development" else os.environ["DB_PROD"]
 # impersonate="chrome124" でChromeのTLSフィンガープリントを模倣する
 session = Session(impersonate="chrome124")
 
@@ -31,14 +26,16 @@ for child in countNode.find_all():
 totalJapanEstateCount = int(countNode.getText().strip().replace(",", ""))        
 
 def insertEstates(geocode):
-    today = date.today()
-    is_existing_estates = supabase.table("estates").select().eq("geo_code", geocode).gte("created_at", today.strftime("%Y-%m-%d")).execute()
-    if(len(is_existing_estates.data) > 0):
+    # dev環境の場合、千代田区の物件1件のみを取得する
+    if(os.environ["ENV"]=="development" and geocode!="13101"):
+        return
+    datetime = date.today().strftime("%Y-%m-%d")
+    is_existing_estates = requests.get(f"{DOMAIN}/estates?geo_code={geocode}&date={datetime}")
+    if(len(is_existing_estates.json()) > 0):
         print(f"本日はすでに取得済です:{geocode}")
         return
     print(f"処理開始:{geocode}")
     
-
     # 以下の処理を、GEOCODEの数だけ繰り返し処理する
 
     # まずは、物件の総件数を取得する
@@ -52,24 +49,24 @@ def insertEstates(geocode):
     estateCount = int(countNode.getText().strip().replace(",", ""))
     if(estateCount == totalJapanEstateCount):
         print(f"このジオコードは無効です。スキップします:{geocode}")
-        supabase.table("estates").delete().eq("geo_code", geocode).execute()
         return
-    totalPage = min(estateCount//30 + 1, 30)
+    totalPage = 1 if os.environ["ENV"] == "development" else min(estateCount//30 + 1, 30)
     print(f"Total pages: {totalPage}")
     dataArray = []
-    for page in range(1, totalPage + 1):
+
+    for page in range(totalPage):
         print(f"Processing page {page}...")
         estateArray=[]
 
-        while len(estateArray) < 1:
-            print("取得します")
-            prev_url = f"{BASE_URL}?geo={geocode}&page={page - 1}" if page > 1 else BASE_URL
-            soup = getSoup(f"{BASE_URL}?geo={geocode}&page={page}&info_open=7", referer=prev_url)
-            estateArray = soup.find_all(class_="ListBukken__item")
-            if len(estateArray) < 1:
-                break
-
-        for estate in estateArray:
+        print("取得します")
+        prev_url = f"{BASE_URL}?geo={geocode}&page={page - 1}" if page > 1 else BASE_URL
+        soup = getSoup(f"{BASE_URL}?geo={geocode}&page={page}&info_open=7", referer=prev_url)
+        estateArray = soup.find_all(class_="ListBukken__item")
+        if len(estateArray) < 1:
+            break
+        
+        for index in range(1) if os.environ["ENV"] == "development" else range(len(estateArray)):
+            estate = estateArray[index]
             estateSoup = BeautifulSoup(str(estate), "html.parser") 
             name=estateSoup.find(class_="ListCassette__ttl__link").getText()
             address = estateSoup.find(class_="svg--pin--simple").find_next_sibling().getText()
@@ -108,17 +105,10 @@ def insertEstates(geocode):
             dataArray.append(data)
                 
     print(f"更新開始:{geocode}")
-    supabase.table("estates").delete().eq("geo_code", geocode).execute()
 
-    if(len(dataArray) > 0):
-        supabase.table("estates").insert(dataArray).execute()
-        supabase.functions.invoke(
-            "set-geom",
-            invoke_options={"body": {"name": "Functions"}}
-        )
-
-
-
+    requests.delete(f"{DOMAIN}/estates?geo_code={geocode}")
+    requests.post(f"{DOMAIN}/estates", json=dataArray)
+    requests.post(f"{DOMAIN}/set_geom?geo_code={geocode}")
 
 geocodes = GEOCODE_LISTS[int(os.environ.get("CLOUD_RUN_TASK_INDEX", 0))]
 if os.environ.get("CLOUD_RUN_TASK_SUB_INDEX", ""):
@@ -126,6 +116,9 @@ if os.environ.get("CLOUD_RUN_TASK_SUB_INDEX", ""):
     total_sub_index = int(os.environ["CLOUD_RUN_TOTAL_SUB_INDEX"])
     geocodes = geocodes[sub_index::total_sub_index]  # Adjust the slicing based on the number of sub-tasks
 for geocode in geocodes:
-    insertEstates(geocode)
+    try:
+        insertEstates(geocode)
+    except Exception as e:
+        print(f"Error processing geocode {geocode}: {e}")
 
 print("batch completed")
