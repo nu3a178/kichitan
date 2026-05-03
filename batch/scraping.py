@@ -10,7 +10,7 @@ from datetime import date
 load_dotenv()
 
 BASE_URL = f"{os.environ['YAHOO_ESTATE_DOMAIN']}/rent/search/"
-DOMAIN = os.environ["DB_DEV"] if os.environ["ENV"] == "development" else os.environ["DB_PROD"]
+DB_DOMAIN = os.environ["API_URL_DEV"] if os.environ["ENV"] == "development" else os.environ["API_URL_PROD"]
 # impersonate="chrome124" でChromeのTLSフィンガープリントを模倣する
 session = Session(impersonate="chrome124")
 
@@ -30,7 +30,7 @@ def insertEstates(geocode):
     if(os.environ["ENV"]=="development" and geocode!="13101"):
         return
     datetime = date.today().strftime("%Y-%m-%d")
-    is_existing_estates = requests.get(f"{DOMAIN}/estates?geo_code={geocode}&date={datetime}")
+    is_existing_estates = requests.get(f"{DB_DOMAIN}/estates?geo_code={geocode}&date={datetime}")
     if(len(is_existing_estates.json()) > 0):
         print(f"本日はすでに取得済です:{geocode}")
         return
@@ -106,9 +106,9 @@ def insertEstates(geocode):
                 
     print(f"更新開始:{geocode}")
 
-    requests.delete(f"{DOMAIN}/estates?geo_code={geocode}")
-    requests.post(f"{DOMAIN}/estates", json=dataArray)
-    requests.post(f"{DOMAIN}/set_geom?geo_code={geocode}")
+    requests.delete(f"{DB_DOMAIN}/estates?geo_code={geocode}")
+    requests.post(f"{DB_DOMAIN}/estates", json=dataArray)
+    requests.post(f"{DB_DOMAIN}/set_geom?geo_code={geocode}")
 
 geocodes = GEOCODE_LISTS[int(os.environ.get("CLOUD_RUN_TASK_INDEX", 0))]
 if os.environ.get("CLOUD_RUN_TASK_SUB_INDEX", ""):
