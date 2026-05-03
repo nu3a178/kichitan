@@ -148,7 +148,7 @@ export const importTrainLinesCsv = async () => {
 };
 
 export const initEstateTable = async () => {
-  if (process.env.NODE_ENV !== "dev") return;
+  if (process.env.ENV !== "development") return;
   try {
     const result = await prisma.estate.deleteMany();
     console.log("Estates deleted successfully:", result.count);
@@ -158,7 +158,7 @@ export const initEstateTable = async () => {
 };
 
 export const importEstatesCsv = async () => {
-  if (process.env.NODE_ENV !== "dev") return;
+  if (process.env.ENV !== "development") return;
   const estates = readCsvDir(ESTATES_DIR);
   const estateParams = estates.map((e) => ({
     name: e.name,
@@ -176,7 +176,7 @@ export const importEstatesCsv = async () => {
 };
 
 export const setGeomIntoEstates = async () => {
-  if (process.env.NODE_ENV !== "dev") return;
+  if (process.env.ENV !== "development") return;
   try {
     const result = await fetch(`http://localhost:3000/set_geom`, {
       method: "POST",
