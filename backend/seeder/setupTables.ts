@@ -175,9 +175,8 @@ export const importEstatesCsv = async () => {
 export const setGeomIntoEstates = async () => {
   if (process.env.ENV !== "development") return;
   try {
-    const result = await fetch(`http://localhost:3000/set_geom`, {
-      method: "POST",
-    });
+    const result =
+      await prisma.$queryRaw`UPDATE "Estate" SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)`;
     console.log("Geom set into estates successfully");
   } catch (error) {
     console.error("Error setting geom into estates:", error);

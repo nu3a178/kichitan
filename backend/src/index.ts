@@ -20,7 +20,10 @@ const EstateInputSchema = z.object({
   floor_num: z.string().optional(),
   geo_code: z.string().optional(),
 });
-
+const VALHALLA_DOMAIN =
+  process.env.NODE_ENV === "development"
+    ? process.env.VALHALLA_URL_DEV
+    : process.env.VALHALLA_URL_PROD;
 const app = new Hono();
 const api = app.basePath("/api");
 
@@ -116,7 +119,7 @@ api.get("/reachable_estate", async (c) => {
       : {}),
   };
   const geoResult = await fetch(
-    `http://localhost:8002/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
+    `${VALHALLA_DOMAIN}/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
   );
   if (!geoResult.ok) {
     return c.json({ error: await geoResult.text() }, geoResult.status as any);
@@ -143,7 +146,7 @@ api.get("/estate_route", async (c) => {
     costing: q.costing,
   };
   const response = await fetch(
-    `http://localhost:8002/optimized_route?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
+    `${VALHALLA_DOMAIN}/optimized_route?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
   );
   const responseData = await response.json();
   const encodedRoute = responseData.trip.legs[0].shape;
