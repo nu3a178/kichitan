@@ -109,6 +109,9 @@ api.post("/set_geom", async (c) => {
 });
 
 api.get("/reachable_estate", async (c) => {
+  if (!VALHALLA_DOMAIN) {
+    return c.json({ error: "Valhalla URL is not configured" }, 503);
+  }
   const q = c.req.query();
   const valhallaJson = {
     locations: JSON.parse(q.locations),
@@ -118,9 +121,14 @@ api.get("/reachable_estate", async (c) => {
       ? { costing_options: JSON.parse(q.costing_options) }
       : {}),
   };
-  const geoResult = await fetch(
-    `${VALHALLA_DOMAIN}/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
-  );
+  let geoResult: Response;
+  try {
+    geoResult = await fetch(
+      `${VALHALLA_DOMAIN}/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
+    );
+  } catch (e) {
+    return c.json({ error: `Valhalla unreachable: ${(e as Error).message}` }, 503);
+  }
   if (!geoResult.ok) {
     return c.json({ error: await geoResult.text() }, geoResult.status as any);
   }
@@ -139,15 +147,22 @@ api.get("/reachable_estate", async (c) => {
 });
 
 api.get("/estate_route", async (c) => {
+  if (!VALHALLA_DOMAIN) {
+    return c.json({ error: "Valhalla URL is not configured" }, 503);
+  }
   const q = c.req.query();
-  console.log();
   const valhallaJson = {
     locations: JSON.parse(q.locations),
     costing: q.costing,
   };
-  const response = await fetch(
-    `${VALHALLA_DOMAIN}/optimized_route?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
-  );
+  let response: Response;
+  try {
+    response = await fetch(
+      `${VALHALLA_DOMAIN}/optimized_route?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
+    );
+  } catch (e) {
+    return c.json({ error: `Valhalla unreachable: ${(e as Error).message}` }, 503);
+  }
   const responseData = await response.json();
   const encodedRoute = responseData.trip.legs[0].shape;
   const time = responseData.trip.legs[0].summary.time;
