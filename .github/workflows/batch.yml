@@ -71,8 +71,8 @@ jobs:
       - name: Run batch
         working-directory: batch
         env:
-          ENV: production
-          API_URL_PROD: ${{ secrets.API_URL_PROD }}
+          NODE_ENV: production
+          VITE_HONO_API_URL: ${{ secrets.VITE_HONO_API_URL }}
           YAHOO_ESTATE_DOMAIN: ${{ secrets.YAHOO_ESTATE_DOMAIN }}
           CLOUD_RUN_TASK_INDEX: ${{ matrix.task_index }}
           CLOUD_RUN_TASK_SUB_INDEX: ${{ matrix.sub_index }}

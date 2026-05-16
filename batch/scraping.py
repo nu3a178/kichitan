@@ -10,7 +10,7 @@ from datetime import date
 load_dotenv()
 
 BASE_URL = f"{os.environ['YAHOO_ESTATE_DOMAIN']}/rent/search/"
-DB_DOMAIN = os.environ["API_URL_DEV"] if os.environ["ENV"] == "development" else os.environ["API_URL_PROD"]
+DB_DOMAIN = os.environ["VITE_HONO_API_URL_DEV"] if os.environ["NODE_ENV"] == "development" else os.environ["VITE_HONO_API_URL"]
 # impersonate="chrome124" でChromeのTLSフィンガープリントを模倣する
 session = Session(impersonate="chrome124")
 
@@ -27,11 +27,15 @@ totalJapanEstateCount = int(countNode.getText().strip().replace(",", ""))
 
 def insertEstates(geocode):
     # dev環境の場合、千代田区の物件1件のみを取得する
-    if(os.environ["ENV"]=="development" and geocode!="13101"):
+    if(os.environ["NODE_ENV"]=="development" and geocode!="13101"):
         return
     datetime = date.today().strftime("%Y-%m-%d")
     is_existing_estates = requests.get(f"{DB_DOMAIN}/estates?geo_code={geocode}&date={datetime}")
-    if(len(is_existing_estates.json()) > 0):
+    try:
+        estates_data = is_existing_estates.json()
+    except Exception as e:
+        raise Exception(f"GET /estates JSON parse error: {e} | raw: {is_existing_estates.text[:300]}")
+    if(len(estates_data) > 0):
         print(f"本日はすでに取得済です:{geocode}")
         return
     print(f"処理開始:{geocode}")
@@ -50,7 +54,7 @@ def insertEstates(geocode):
     if(estateCount == totalJapanEstateCount):
         print(f"このジオコードは無効です。スキップします:{geocode}")
         return
-    totalPage = 1 if os.environ["ENV"] == "development" else min(estateCount//30 + 1, 30)
+    totalPage = 1 if os.environ["NODE_ENV"] == "development" else min(estateCount//30 + 1, 30)
     print(f"Total pages: {totalPage}")
     dataArray = []
 
@@ -65,7 +69,7 @@ def insertEstates(geocode):
         if len(estateArray) < 1:
             break
         
-        for index in range(1) if os.environ["ENV"] == "development" else range(len(estateArray)):
+        for index in range(1) if os.environ["NODE_ENV"] == "development" else range(len(estateArray)):
             estate = estateArray[index]
             estateSoup = BeautifulSoup(str(estate), "html.parser") 
             name=estateSoup.find(class_="ListCassette__ttl__link").getText()
