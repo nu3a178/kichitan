@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
+import { GoogleAuth } from "google-auth-library";
 import { prisma } from "./lib/prisma";
 import { cors } from "hono/cors";
 
@@ -24,6 +25,22 @@ const VALHALLA_URL =
   process.env.NODE_ENV === "development"
     ? process.env.VALHALLA_URL_DEV
     : process.env.VALHALLA_URL_PROD;
+
+let valhallaAuthClient: Awaited<
+  ReturnType<GoogleAuth["getIdTokenClient"]>
+> | null = null;
+
+async function getValhallaAuthHeader(): Promise<string | null> {
+  if (!VALHALLA_URL || !process.env.GOOGLE_SERVICE_ACCOUNT_KEY) return null;
+  if (!valhallaAuthClient) {
+    const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+    const auth = new GoogleAuth({ credentials });
+    valhallaAuthClient = await auth.getIdTokenClient(VALHALLA_URL);
+  }
+  const headers = await valhallaAuthClient.getRequestHeaders();
+  return headers.get("Authorization");
+}
+
 const app = new Hono();
 const api = app.basePath("/api");
 
@@ -121,10 +138,12 @@ api.get("/reachable_estate", async (c) => {
       ? { costing_options: JSON.parse(q.costing_options) }
       : {}),
   };
+  const authHeader = await getValhallaAuthHeader();
   let geoResult: Response;
   try {
     geoResult = await fetch(
       `${VALHALLA_URL}/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
+      authHeader ? { headers: { Authorization: authHeader } } : undefined,
     );
   } catch (e) {
     return c.json(
@@ -158,10 +177,12 @@ api.get("/estate_route", async (c) => {
     locations: JSON.parse(q.locations),
     costing: q.costing,
   };
+  const authHeader = await getValhallaAuthHeader();
   let response: Response;
   try {
     response = await fetch(
       `${VALHALLA_URL}/optimized_route?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
+      authHeader ? { headers: { Authorization: authHeader } } : undefined,
     );
   } catch (e) {
     return c.json(
