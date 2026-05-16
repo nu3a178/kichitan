@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && tsc",
+    "build": "prisma generate && tsup",
     "type-check": "tsc --noEmit",
     "start": "node dist/index.js",
     "seeder": "tsx seeder/index.ts"
@@ -21,6 +21,7 @@
     "@types/node": "^20.19.39",
     "dotenv": "^17.4.2",
     "prisma": "^7.7.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.8.3"
   }
