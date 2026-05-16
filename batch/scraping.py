@@ -81,7 +81,7 @@ def insertEstates(geocode):
             rentPriceNode.find().decompose()
             rentPrice = int(float(rentPriceNode.getText().strip().split("万")[0])*10000)
             feeInfoNode = estateSoup.find(class_="ListCassetteRoom__dtl__price__txtS")
-            feeInfo = feeInfoNode.getText().strip() if feeInfoNode else None
+            feeInfo = feeInfoNode.getText().strip() if feeInfoNode else ""
             detailSoup = getSoup(f"{os.environ['YAHOO_ESTATE_DOMAIN']}{url}")
             script_tag = detailSoup.find('script', string=re.compile(r'__SERVER_SIDE_CONTEXT__'))
             if script_tag is None:
