@@ -107,7 +107,7 @@ def insertEstates(geocode):
             print(f"Address: {address}, Latitude: {lat}, Longitude: {lng}")
             data = {"name": name, "address": address, "rent_price": rentPrice, "fee_info": feeInfo, "geo_code": geocode, "latitude": lat, "longitude": lng, "img": img, "url": url, "floor_plan": floor_plan, "area": area, "years_old": years_old, "floor_num": floor_num}
             dataArray.append(data)
-                
+            print(dataArray)
     print(f"更新開始:{geocode}")
 
     res = requests.delete(f"{DB_DOMAIN}/estates?geo_code={geocode}")
