@@ -1,7 +1,25 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import { prisma } from "./lib/prisma";
 import { cors } from "hono/cors";
+
+const EstateInputSchema = z.object({
+  name: z.string(),
+  address: z.string().optional(),
+  latitude: z.number(),
+  longitude: z.number(),
+  rent_price: z.number().int().optional(),
+  fee_info: z.string().optional(),
+  img: z.string().optional(),
+  url: z.string().optional(),
+  floor_plan: z.string().optional(),
+  area: z.number().optional(),
+  years_old: z.number().int().optional(),
+  floor_num: z.string().optional(),
+  geo_code: z.string().optional(),
+});
 
 const app = new Hono();
 const api = app.basePath("/api");
@@ -142,13 +160,15 @@ api.delete("/estates", async (c) => {
   return c.json({ deleted: result.count });
 });
 
-api.post("/estates", async (c) => {
-  const data = await c.req.json();
-  const result = await prisma.estate.createMany({
-    data,
-  });
-  return c.json({ created: result });
-});
+api.post(
+  "/estates",
+  zValidator("json", z.array(EstateInputSchema)),
+  async (c) => {
+    const data = c.req.valid("json");
+    const result = await prisma.estate.createMany({ data });
+    return c.json({ created: result });
+  },
+);
 api.get("/estates", async (c) => {
   const geoCode = c.req.query("geo_code");
   const date = new Date(c.req.query("date") ?? "1900-01-01");
