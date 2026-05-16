@@ -4,14 +4,15 @@ import { prisma } from "./lib/prisma";
 import { cors } from "hono/cors";
 
 const app = new Hono();
+const api = app.basePath("/api");
 
-app.use("*", cors());
+app.use("/api/*", cors());
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-app.get("/prefectures", async (c) => {
+api.get("/prefectures", async (c) => {
   const prefectures = await prisma.prefecture.findMany({
     select: {
       name: true,
@@ -24,7 +25,7 @@ app.get("/prefectures", async (c) => {
   return c.json(prefectures);
 });
 
-app.get("/train_lines", async (c) => {
+api.get("/train_lines", async (c) => {
   const prefectureCode = c.req.query("p_code");
   const trainLines = await prisma.trainLine.findMany({
     select: {
@@ -41,7 +42,7 @@ app.get("/train_lines", async (c) => {
   return c.json(trainLines);
 });
 
-app.get("/stations", async (c) => {
+api.get("/stations", async (c) => {
   const trainLineCode = c.req.query("l_code");
   const stations = await prisma.station.findMany({
     select: {
@@ -57,7 +58,7 @@ app.get("/stations", async (c) => {
   return c.json(stations);
 });
 
-app.get("/suggest_station", async (c) => {
+api.get("/suggest_station", async (c) => {
   const query = c.req.query("q");
   const suggestions = await prisma.station.findMany({
     where: {
@@ -76,7 +77,7 @@ app.get("/suggest_station", async (c) => {
   });
   return c.json(suggestions);
 });
-app.post("/set_geom", async (c) => {
+api.post("/set_geom", async (c) => {
   const geoCode = c.req.query("geo_code");
   const result = await prisma.$executeRaw`
     UPDATE "Estate" 
@@ -86,7 +87,7 @@ app.post("/set_geom", async (c) => {
   return c.json({ updated: result });
 });
 
-app.get("/reachable_estate", async (c) => {
+api.get("/reachable_estate", async (c) => {
   const q = c.req.query();
   const valhallaJson = {
     locations: JSON.parse(q.locations),
@@ -116,7 +117,7 @@ app.get("/reachable_estate", async (c) => {
   return c.json({ estates: searchResult, polygon: geoData });
 });
 
-app.get("/estate_route", async (c) => {
+api.get("/estate_route", async (c) => {
   const q = c.req.query();
   console.log();
   const valhallaJson = {
@@ -131,7 +132,7 @@ app.get("/estate_route", async (c) => {
   const time = responseData.trip.legs[0].summary.time;
   return c.json({ encodedRoute, time });
 });
-app.delete("/estates", async (c) => {
+api.delete("/estates", async (c) => {
   const geoCode = c.req.query("geo_code");
   const result = await prisma.estate.deleteMany({
     where: {
@@ -141,14 +142,14 @@ app.delete("/estates", async (c) => {
   return c.json({ deleted: result.count });
 });
 
-app.post("/estates", async (c) => {
+api.post("/estates", async (c) => {
   const data = await c.req.json();
   const result = await prisma.estate.createMany({
     data,
   });
   return c.json({ created: result });
 });
-app.get("/estates", async (c) => {
+api.get("/estates", async (c) => {
   const geoCode = c.req.query("geo_code");
   const date = new Date(c.req.query("date") ?? "1900-01-01");
   const estates = await prisma.estate.findMany({

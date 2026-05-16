@@ -12,7 +12,7 @@
     "jsxImportSource": "hono/jsx",
     "outDir": "./dist",
     "esModuleInterop": true,
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "5.0"
   },
   "exclude": ["node_modules"]
 }

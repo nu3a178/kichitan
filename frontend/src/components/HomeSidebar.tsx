@@ -179,7 +179,6 @@ export function HomeSidebar() {
       setStationSuggestions([]);
       return;
     }
-    console.log(value);
     const result = await getStationsByQuery(value);
     setStationSuggestions(result);
   };

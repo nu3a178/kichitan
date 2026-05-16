@@ -40,8 +40,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE }}
+          VITE_HONO_API_URL: ${{ secrets.VITE_HONO_API_URL }}
           VITE_YAHOO_ESTATE_DOMAIN: ${{ secrets.VITE_YAHOO_ESTATE_DOMAIN }}
         run: npm run build
 
