@@ -110,9 +110,15 @@ def insertEstates(geocode):
                 
     print(f"更新開始:{geocode}")
 
-    requests.delete(f"{DB_DOMAIN}/estates?geo_code={geocode}")
-    requests.post(f"{DB_DOMAIN}/estates", json=dataArray)
-    requests.post(f"{DB_DOMAIN}/set_geom?geo_code={geocode}")
+    res = requests.delete(f"{DB_DOMAIN}/estates?geo_code={geocode}")
+    if not res.ok:
+        raise Exception(f"DELETE /estates failed: {res.status_code} | {res.text[:300]}")
+    res = requests.post(f"{DB_DOMAIN}/estates", json=dataArray)
+    if not res.ok:
+        raise Exception(f"POST /estates failed: {res.status_code} | {res.text[:300]}")
+    res = requests.post(f"{DB_DOMAIN}/set_geom?geo_code={geocode}")
+    if not res.ok:
+        raise Exception(f"POST /set_geom failed: {res.status_code} | {res.text[:300]}")
 
 geocodes = GEOCODE_LISTS[int(os.environ.get("CLOUD_RUN_TASK_INDEX", 0))]
 if os.environ.get("CLOUD_RUN_TASK_SUB_INDEX", ""):
