@@ -100,10 +100,10 @@ def insertEstates(geocode):
             area_match = re.search(r'"MonopolyArea"\s*:\s*(\d+)', script)
             years_old_match = re.search(r'"YearsOld"\s*:\s*(\d+)', script)
             floor_num_match = re.search(r'"FloorNum"\s*:\s*"([^"]+)"', script)
-            floor_plan = json.loads(f'"{floor_plan_match.group(1)}"') if floor_plan_match else None
-            area = int(area_match.group(1)) / 100 if area_match else None
-            years_old = int(years_old_match.group(1)) if years_old_match else None
-            floor_num = floor_num_match.group(1) if floor_num_match else None
+            floor_plan = json.loads(f'"{floor_plan_match.group(1)}"') if floor_plan_match else ""
+            area = int(area_match.group(1)) / 100 if area_match else ""
+            years_old = int(years_old_match.group(1)) if years_old_match else ""
+            floor_num = floor_num_match.group(1) if floor_num_match else ""
             print(f"Address: {address}, Latitude: {lat}, Longitude: {lng}")
             data = {"name": name, "address": address, "rent_price": rentPrice, "fee_info": feeInfo, "geo_code": geocode, "latitude": lat, "longitude": lng, "img": img, "url": url, "floor_plan": floor_plan, "area": area, "years_old": years_old, "floor_num": floor_num}
             dataArray.append(data)
