@@ -108,47 +108,6 @@ api.post("/set_geom", async (c) => {
   return c.json({ updated: result });
 });
 
-api.get("/reachable_estate", async (c) => {
-  if (!VALHALLA_URL) {
-    return c.json({ error: "Valhalla URL is not configured" }, 503);
-  }
-  const q = c.req.query();
-  const valhallaJson = {
-    locations: JSON.parse(q.locations),
-    costing: q.costing,
-    contours: JSON.parse(q.contours),
-    ...(q.costing_options
-      ? { costing_options: JSON.parse(q.costing_options) }
-      : {}),
-  };
-  let geoResult: Response;
-  try {
-    geoResult = await fetch(
-      `https://valhalla-985293995102.asia-northeast1.run.app/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
-    );
-  } catch (e) {
-    return c.json(
-      { error: `Valhalla unreachable: ${(e as Error).message}` },
-      503,
-    );
-  }
-  if (!geoResult.ok) {
-    return c.json({ error: await geoResult.text() }, geoResult.status as any);
-  }
-  const geoData = await geoResult.json();
-  const coordinates = geoData.features[0].geometry.coordinates;
-  const geoJson = JSON.stringify({
-    type: "Polygon",
-    coordinates: [[...coordinates, coordinates[0]]],
-  });
-  const searchResult = await prisma.$queryRaw`
-    SELECT id, name, address, latitude, longitude, rent_price, fee_info, img, url, floor_plan, area, years_old, floor_num
-    FROM "Estate"
-    WHERE ST_Within(geom::geometry, ST_GeomFromGeoJSON(${geoJson}))
-  `;
-  return c.json({ estates: searchResult, polygon: geoData });
-});
-
 api.get("/estate_route", async (c) => {
   if (!VALHALLA_URL) {
     return c.json({ error: "Valhalla URL is not configured" }, 503);
