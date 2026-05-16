@@ -32,7 +32,9 @@ dist-ssr
 /osrm-valhalla/custom_files/*
 !/osrm-valhalla/custom_files/.gitkeep
 
+**/__pycache__/
 batch/node_modules/
+
 .agents/*
 .claude/**/
 
