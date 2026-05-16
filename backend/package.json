@@ -3,7 +3,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
+    "type-check": "tsc --noEmit",
     "start": "node dist/index.js",
     "seeder": "tsx seeder/index.ts"
   },
