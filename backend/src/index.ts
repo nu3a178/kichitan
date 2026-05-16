@@ -124,7 +124,7 @@ api.get("/reachable_estate", async (c) => {
   let geoResult: Response;
   try {
     geoResult = await fetch(
-      `${VALHALLA_URL}/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
+      `https://valhalla-985293995102.asia-northeast1.run.app/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
     );
   } catch (e) {
     return c.json(
