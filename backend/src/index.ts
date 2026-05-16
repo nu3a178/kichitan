@@ -20,7 +20,7 @@ const EstateInputSchema = z.object({
   floor_num: z.string().optional(),
   geo_code: z.string().optional(),
 });
-const VALHALLA_DOMAIN =
+const VALHALLA_URL =
   process.env.NODE_ENV === "development"
     ? process.env.VALHALLA_URL_DEV
     : process.env.VALHALLA_URL_PROD;
@@ -109,7 +109,7 @@ api.post("/set_geom", async (c) => {
 });
 
 api.get("/reachable_estate", async (c) => {
-  if (!VALHALLA_DOMAIN) {
+  if (!VALHALLA_URL) {
     return c.json({ error: "Valhalla URL is not configured" }, 503);
   }
   const q = c.req.query();
@@ -124,10 +124,13 @@ api.get("/reachable_estate", async (c) => {
   let geoResult: Response;
   try {
     geoResult = await fetch(
-      `${VALHALLA_DOMAIN}/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
+      `${VALHALLA_URL}/isochrone?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
     );
   } catch (e) {
-    return c.json({ error: `Valhalla unreachable: ${(e as Error).message}` }, 503);
+    return c.json(
+      { error: `Valhalla unreachable: ${(e as Error).message}` },
+      503,
+    );
   }
   if (!geoResult.ok) {
     return c.json({ error: await geoResult.text() }, geoResult.status as any);
@@ -147,7 +150,7 @@ api.get("/reachable_estate", async (c) => {
 });
 
 api.get("/estate_route", async (c) => {
-  if (!VALHALLA_DOMAIN) {
+  if (!VALHALLA_URL) {
     return c.json({ error: "Valhalla URL is not configured" }, 503);
   }
   const q = c.req.query();
@@ -158,10 +161,13 @@ api.get("/estate_route", async (c) => {
   let response: Response;
   try {
     response = await fetch(
-      `${VALHALLA_DOMAIN}/optimized_route?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
+      `${VALHALLA_URL}/optimized_route?json=${encodeURIComponent(JSON.stringify(valhallaJson))}`,
     );
   } catch (e) {
-    return c.json({ error: `Valhalla unreachable: ${(e as Error).message}` }, 503);
+    return c.json(
+      { error: `Valhalla unreachable: ${(e as Error).message}` },
+      503,
+    );
   }
   const responseData = await response.json();
   const encodedRoute = responseData.trip.legs[0].shape;
