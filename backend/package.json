@@ -12,6 +12,7 @@
     "@hono/node-server": "^1.19.14",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
+    "dotenv": "^17.4.2",
     "firebase": "^12.12.1",
     "hono": "^4.12.14",
     "postgres": "^3.4.9",
@@ -19,7 +20,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.39",
-    "dotenv": "^17.4.2",
     "prisma": "^7.7.0",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
