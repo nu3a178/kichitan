@@ -1,0 +1,83 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [postgis]
+}
+
+model Estate {
+  id         Int      @id @default(autoincrement())
+  name       String
+  address    String?
+  latitude   Float
+  longitude  Float
+  geom       Unsupported("geography(Point, 4326)")?
+  rent_price Int?
+  fee_info   String?
+  img        String?
+  url        String?
+  floor_plan String?
+  area       Float?
+  years_old  Int?
+  floor_num  String?
+  geo_code   String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+}
+
+model Prefecture {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  code                String                @unique
+  latitude            Float
+  longitude           Float
+  zoom                Int
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime              @updatedAt @db.Timestamptz(6)
+  prefecture_train_line PrefectureTrainLine[]
+  station             Station[]
+}
+
+model PrefectureTrainLine {
+  id              Int        @id @default(autoincrement())
+  prefecture_code String
+  train_line_code String 
+  created_at      DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime   @updatedAt @db.Timestamptz(6)
+  prefecture      Prefecture @relation(fields: [prefecture_code], references: [code])
+  train_line       TrainLine  @relation(fields: [train_line_code], references: [code])
+}
+
+model Station {
+  id              Int        @id @default(autoincrement())
+  name            String
+  code            String        @unique
+  latitude        Float
+  longitude       Float
+  zoom            Int
+  prefecture_code String
+  line_code       String
+  created_at      DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime   @updatedAt @db.Timestamptz(6)
+  train_line       TrainLine  @relation(fields: [line_code], references: [code])
+  prefecture      Prefecture @relation(fields: [prefecture_code], references: [code])
+}
+
+model TrainLine {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  code                String                @unique
+  latitude            Float
+  longitude           Float
+  zoom                Int
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime              @updatedAt @db.Timestamptz(6)
+  color               String
+  prefecture_train_line PrefectureTrainLine[]
+  station             Station[]
+}
+
