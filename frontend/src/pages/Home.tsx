@@ -25,7 +25,6 @@ const HomeContent = () => {
     >
       <div className={isMobile ? "absolute left-0 z-[1000]" : ""}>
         <HomeSidebar />
-        {/* <></> */}
         {isMobile && !openMobile && (
           <SidebarTrigger className="bg-green-800 text-white">
             <FaHouseUser />
