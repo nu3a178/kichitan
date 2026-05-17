@@ -40,7 +40,7 @@ async function getValhallaAuthHeader(): Promise<string | null> {
   const headers = await valhallaAuthClient.getRequestHeaders();
   return headers.get("Authorization");
 }
-
+//
 const app = new Hono();
 const api = app.basePath("/api");
 
