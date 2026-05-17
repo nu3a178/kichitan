@@ -41,7 +41,7 @@ vi.mock("react-leaflet", () => ({
   }),
 }));
 
-vi.mock("@/utils/supabaseApi", async () => {
+vi.mock("@/utils/api", async () => {
   const { PREFECTURES, LINES, STATIONS, ESTATES_AND_POLYGONS } =
     await import("./const");
   return {
@@ -54,6 +54,7 @@ vi.mock("@/utils/supabaseApi", async () => {
       .mockResolvedValue({ polyline: [[35, 135]], time: 0 }),
   };
 });
+
 beforeEach(async () => {
   await act(async () => {
     render(

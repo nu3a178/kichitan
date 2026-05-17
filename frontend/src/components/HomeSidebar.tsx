@@ -34,6 +34,7 @@ import releaseNoteTexts from "@/assets/release_note";
 import { Link } from "react-router-dom";
 import {
   getLinesInPrefecture,
+  getPrefectures,
   getStationsByQuery,
   getStationsInLine,
   searchReachableEstate,
@@ -69,11 +70,9 @@ export function HomeSidebar() {
   } = useMapContext();
   const { setRoute } = useRouteContext();
 
-  const apiUrl = import.meta.env.VITE_HONO_API_URL;
   useEffect(() => {
     const fetchPrefectures = async () => {
-      const data = await fetch(`${apiUrl}/prefectures`);
-      const prefectures = (await data.json()) as Prefecture[];
+      const prefectures = await getPrefectures();
       const prefectureNames = prefectures.map((prefecture) => ({
         code: prefecture.code,
         name: prefecture.name,
@@ -306,7 +305,7 @@ export function HomeSidebar() {
         </div>
         <div className="h-20"></div>
         <Select
-          value={selectedPrefecture?.code}
+          value={selectedPrefecture?.code ?? ""}
           onValueChange={(value) => onChangePrefecture(value)}
         >
           <SelectTrigger
